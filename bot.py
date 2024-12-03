@@ -219,6 +219,10 @@ def get_cookies(driver):
 def socks5geter():
     prapi1 = "https://raw.githubusercontent.com/TheSpeedX/SOCKS-List/master/socks5.txt"
     prapi2 = "https://api.proxyscrape.com/v4/free-proxy-list/get?request=display_proxies&proxy_format=ipport&format=text&timeout=1000"
+    prapi3 = "https://raw.githubusercontent.com/hookzof/socks5_list/refs/heads/master/proxy.txt"
+    prapi4 = "https://sunny9577.github.io/proxy-scraper/generated/socks5_proxies.txt"
+    prapi5 = "https://raw.githubusercontent.com/monosans/proxy-list/main/proxies_anonymous/socks5.txt"
+    prapi6 = "https://raw.githubusercontent.com/monosans/proxy-list/main/proxies/socks5.txt"
     pf = open('socks5.txt', 'w+')
     rq = (get(prapi1).text).split()
     for pyy in rq:
@@ -226,6 +230,30 @@ def socks5geter():
     pf.close()
     pf = open('socks5.txt' , 'a')
     rq = (get(prapi2).text).split()
+    pf.write('\n')
+    for pyy in rq:
+        pf.write(pyy + '\n')
+    pf.close()
+    pf = open('socks5.txt' , 'a')
+    rq = (get(prapi3).text).split()
+    pf.write('\n')
+    for pyy in rq:
+        pf.write(pyy + '\n')
+    pf.close()
+    pf = open('socks5.txt' , 'a')
+    rq = (get(prapi4).text).split()
+    pf.write('\n')
+    for pyy in rq:
+        pf.write(pyy + '\n')
+    pf.close()
+    pf = open('socks5.txt' , 'a')
+    rq = (get(prapi5).text).split()
+    pf.write('\n')
+    for pyy in rq:
+        pf.write(pyy + '\n')
+    pf.close()
+    pf = open('socks5.txt' , 'a')
+    rq = (get(prapi6).text).split()
     pf.write('\n')
     for pyy in rq:
         pf.write(pyy + '\n')
