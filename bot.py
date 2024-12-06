@@ -370,9 +370,10 @@ def main():
                                 ":path": path,
                                 ":scheme": iur,
                                 ":authority": target,
-                                "User-Agent": ua,
-                                "Accept": che(app),
-                                "Accept-Encoding": "gzip, deflate, br",
+                                "user-agent": ua,
+                                "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                                "accept-encoding": "gzip, deflate, br",
+                                "connection": "keep-alive",
                                 "encrypted-data": encrypted_data
                             }
                             stream_id = conn.get_next_available_stream_id()
@@ -612,9 +613,10 @@ def main():
                                 ":path": path,
                                 ":scheme": iur,
                                 ":authority": target,
-                                "User-Agent": ua,
-                                "Accept": che(app),
-                                "Accept-Encoding": "gzip, deflate, br",
+                                "user-agent": ua,
+                                "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                                "accept-encoding": "gzip, deflate, br",
+                                "connection": "keep-alive",
                                 "encrypted-data": encrypted_data
                             }
                             stream_id = conn.get_next_available_stream_id()
