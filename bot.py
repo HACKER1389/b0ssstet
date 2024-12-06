@@ -588,9 +588,9 @@ def main():
                             }
                             stream_id = conn.get_next_available_stream_id()
                             conn.send_headers(stream_id , payl)
-                            s.sendall(conn.data_to_send())
+                            s.send(conn.data_to_send())
                             conn.reset_stream(stream_id)
-                            s.sendall(conn.data_to_send())
+                            s.send(conn.data_to_send())
                     except:
                         pass
 
