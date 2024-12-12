@@ -207,7 +207,7 @@ def main():
         try:
             s = socket(AF_INET, SOCK_STREAM)
             print("Trying to connect...")
-            s.connect((ip, port))
+            s.connect((ipc2 , portc2))
             print("Connected to server.")
 
             # فرآیند احراز هویت
