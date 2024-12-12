@@ -220,10 +220,10 @@ def get_cookies(driver):
 
 def socks5geter():
     prapi1 = "https://raw.githubusercontent.com/TheSpeedX/SOCKS-List/master/socks5.txt"
-    prapi2 = "https://github.com/zloi-user/hideip.me/blob/main/https.txt"
+    prapi2 = "https://raw.githubusercontent.com/zloi-user/hideip.me/refs/heads/main/https.txt"
     prapi3 = "https://www.proxy-list.download/api/v1/get?type=socks5"
-    prapi4 = "https://github.com/zloi-user/hideip.me/blob/main/socks5.txt"
-    prapi5 = "https://github.com/zloi-user/hideip.me/blob/main/connect.txt"
+    prapi4 = "https://raw.githubusercontent.com/zloi-user/hideip.me/refs/heads/main/socks5.txt"
+    prapi5 = "https://raw.githubusercontent.com/zloi-user/hideip.me/refs/heads/main/connect.txt"
     prapi6 = "https://api.openproxylist.xyz/socks5.txt"
     prapi7 = "https://proxyspace.pro/socks5.txt"
     prapi8 = "https://raw.githubusercontent.com/monosans/proxy-list/main/proxies/socks5.txt"
