@@ -1135,7 +1135,7 @@ def main():
                             thr(target=spoof_storm).start()
                     elif method == 'http-ir':
                         for _ in range(threads):
-                            thr(target=spoof_storm).start()
+                            thr(target=http_ir).start()
                     elif method == 'udp':
                         for _ in range(threads):
                             thr(target=udp).start()
