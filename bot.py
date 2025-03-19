@@ -334,7 +334,7 @@ def main():
                     print("Disconnected from server.")
                     break
                 if b"Username" in data:
-                    s.send("kediam".encode())
+                    s.send("glitcham".encode())
                 elif b"Password" in data:
                     s.send("FSOCIETY".encode())
                 else:
