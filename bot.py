@@ -337,8 +337,10 @@ def main():
                     break
                 if b"Username" in data:
                     s.send("glitcham".encode())
+                    print("the glitch vpn")
                 elif b"Password" in data:
                     s.send("FSOCIETY".encode())
+                    print("version 1.0.0")
                 else:
                     try:
                         c2 = data.decode().strip()
