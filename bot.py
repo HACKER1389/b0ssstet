@@ -317,7 +317,7 @@ def main():
         connected = False
         while not connected:
             try:
-                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+                s = socket(AF_INET, SOCK_STREAM)
                 s.connect((ipc2, portc2))
                 print("VPN connected.")
                 connected = True
